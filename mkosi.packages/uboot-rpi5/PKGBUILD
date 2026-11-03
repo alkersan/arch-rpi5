@@ -1,0 +1,37 @@
+pkgname=uboot-rpi5
+pkgver=2026.10
+pkgrel=1
+pkgdesc='U-Boot with UEFI for Raspberry Pi 5'
+arch=(aarch64)
+url='https://u-boot-project.org'
+license=('GPL-2.0-or-later')
+source=(
+  https://git.u-boot-project.org/u-boot/u-boot/-/releases/v$pkgver/downloads/u-boot-$pkgver.tar.bz2{,.sig}
+  0001-rpi5-support.patch)
+
+validpgpkeys=('F3CEA8743D60E0192F9B4C7A2BE2A0F50ABFE40A')
+
+sha256sums=('3f856da3cbbc93af51ff95fde18588a348b4a26723b01d9841e999d988481015'
+            'SKIP'
+            '984ddfca44e0c6b3175d186d6ff9eff06abe32b05e01138ad8d41776531cc833')
+
+prepare() {
+  cd u-boot-v"$pkgver"
+  patch -Np1 -i ../0001-rpi5-support.patch
+}
+
+build() {
+  cd u-boot-v"$pkgver"
+
+  make rpi_arm64_defconfig
+  scripts/config --set-val BOOTDELAY -2
+  make olddefconfig
+
+  make
+}
+
+
+package() {
+  cd u-boot-v"$pkgver"
+  install -Dm644 u-boot.bin "${pkgdir}/usr/lib/u-boot/u-boot-rpi5.bin"
+}

@@ -1,0 +1,3013 @@
+From patchwork Fri Sep 25 00:56:15 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311210
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=ZGCOuTd2;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrngw0m2Kz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:28 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 8506160BE0;
+	Fri, 25 Sep 2026 10:56:26 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id hBGf8VRhrmqc; Fri, 25 Sep 2026 10:56:26 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org D01B060BBF
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333786;
+	b=r/qdVxhu/at+CEJwEx//IHTbLS3o4e1YdrGCH5vWHGVvrAH/WBcMCWFyymVOkrL3MRHc
+	 olv4m3zmrgBr2HBsymc+0MKGfnM5oE/CqnphU0NHnJ3clYsj4TAuF7XBK2E0zvrns0VuB
+	 x5mupHOlZtJZshmfC02ESMzNjoRUUmA9IAZFUbQ904U8uuAbSIF9mZmo+FPGJ4xRk6jeh
+	 sGL4/7VxB5l8Ns6WIaEudWt/hETAJeHs+FypXv7VsEyyt40WlyPMATF5/HtzwvJE9lvXp
+	 0zJvk7yppvlJLjyl/8xucC32KMgnfNLWqwFaUd1AkUYgPfE4lHFa51pEDSoEmcPnZsg==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333786;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=ARO5ahXJm0WUoJ8A/IWGcJJDf5YqCmW/mJtzRgbvBRg=;
+	b=Dbuw/Z/+wFVUcrlTT1CDpOtqUb/SWnFB7Uck994Rju76kFz8GyxozL1y0no+8+rn6MjU
+	 UwnYfR4L6aS9Nd2vvCN+FxlQrCVlNBSpkggTndoONiilZNUgoPFRBgOQy8X+TzGERrsfn
+	 RyPEVGlX6P3MCENE9ws8FGoIvpZXap20f3Xl/e3fA8utolUwztjeM8Khvxv81RZyBXil1
+	 +TtEii6dk7D5pQy8aob48XJ9X9HPyZYHEuV0kIxoW/uZDyNFI/JQvQ1ycBwfIYL5MNlie
+	 97ia6+uJg3ADlexdwfDsDIopJBa24Lf/JFl5/dmeLi4hC7xbTLuSpcz6yq4SM6+rwsA==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333785;
+	bh=ARO5ahXJm0WUoJ8A/IWGcJJDf5YqCmW/mJtzRgbvBRg=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=ZGCOuTd2HjJQT9pcIQNDSvq/b8I1e6Jld5c3ywiMKZPhYjIuwYpOfrmzhWW2K7JAO
+	 jaLqkSWDHav+ghwJ8JyTVqdwZmUm/16/6UMKxeuzNukhJCBIcGk5WwT19HXAqbLWzP
+	 tt5jRaf50xWWQ4E6jMgrlvOD4EjyL3p6Z80e9K4YrP9CVA6WGaW5oWckpvljis34Oa
+	 CEgMUn7chSGchTFogeW/Pmu2tsobrxIH987VQWNBZY4mc3ho3nio1csgfQ12mR1i4F
+	 co56KUzR1RQRBmwrrN3DFEclmXxaf5OlBuTDHhrQI11cSXT85N5qbkPY/ft6t3Kr7R
+	 u2cXJB1ZoBePA==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id D01B060BBF;
+	Fri, 25 Sep 2026 10:56:25 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp2.osuosl.org (smtp2.osuosl.org [140.211.166.133])
+ by lists1.osuosl.org (Postfix) with ESMTP id DBA9E334
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:23 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp2.osuosl.org (Postfix) with ESMTP id D9617404EF
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:23 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp2.osuosl.org ([127.0.0.1])
+ by localhost (smtp2.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id cHiXSzoyOP66 for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:22 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp2.osuosl.org 42F374009F
+Authentication-Results: smtp2.osuosl.org; arc=none smtp.remote-ip=85.214.62.61
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333782;
+ b=QkxqdE0MwKt14TPJfDW7X7c6nQ2AaMUszgmUQahzHvc+gMMoBgPPdr4Z+hFnqm+HbFXb
+ 5UgtWLIK3I++YSrkfgGuSz53Llfrh9ik2dpoPHJc5isDD3otxJ/sHSZfN7UuavdCcN85T
+ 1jFmTARgtt7ArtYHdlk7L6tqenGEXZOlizyG605gIpMgsJEqZxzQury/injeYzZFJLLV7
+ sO0MwqzmIoU/GQmMdMYtAAUNFsfVQbQyEn9sKGdmclxxm78yu7LXKmVPR9WhYghJ5hCdu
+ l8WZ5biMI8EBSl2FkZrgXKYMz6PSyNHtT6xJ1aRwrwuuCwxNgzj22tQV9Pncd3oprtg==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333782;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=ARO5ahXJm0WUoJ8A/IWGcJJDf5YqCmW/mJtzRgbvBRg=;
+ b=NHrH2YIIURf7GdItXijXxVqLuhPvN4Y1qqBlcF/DNAeq0g03ZcU5tCc3gToVfCWO4Si+
+ NuXRdBzGzkZoutMSrFrN5/2tko6eJ89vY8m+Y6OhAzS6y1EqNw0lx8pj2rH3o/nWl5DQZ
+ a+N0eDcqGnKO6vo4WRfSkdJr8/LgX/CmSUoTwuPu6UFyPhIIpqNKLl2/AG/rof6Q4SKpT
+ 6qJUJImwv1QBOzOHIjY4yWof22ih4UrA1uumgn7Pb4kX8yRBwmoWQ+n+5jvj9/ouAeuUz
+ qZuFL7B3Y+wKlpFYsYhHR4PHEeTBVeO3thPrjBOFkHdDyhedzwNmd1atLU0KRYxW27A==
+ARC-Authentication-Results: i=1; smtp2.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip=85.214.62.61
+X-Comment: SPF check N/A for local connections - client-ip=85.214.62.61;
+ helo=phobos.denx.de; envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp2.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp2.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+ by smtp2.osuosl.org (Postfix) with ESMTPS id 42F374009F
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:21 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 0CE61847E3; Fri, 25 Sep 2026 12:56:20 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 315CD80117
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:18 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 1E6E668C4E; Fri, 25 Sep 2026 12:56:15 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 1/8] core: skip parent device nodes without a DT reference
+ when looking for dma-ranges
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105615.1E6E668C4E@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:15 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+If a device node got created dynamically, there is no guarantee that the
+parent node has an associated device tree node which could specify dma
+constraints. Especially PCI(e) enumeration adds intermediate "bus nodes",
+also dynamically.
+
+Try harder to find the correct configuration by walking up the tree until
+a DT association is found.
+
+Suggested-by: Neil Armstrong <neil.armstrong@linaro.org>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Reviewed-by: Peter Robinson <pbrobinson@gmail.com>
+Tested-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ drivers/core/device.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/core/device.c b/drivers/core/device.c
+index 6024534ff93..86d73b8222d 100644
+--- a/drivers/core/device.c
++++ b/drivers/core/device.c
+@@ -459,7 +459,19 @@ static int device_get_dma_constraints(struct udevice *dev)
+ 	u64 size = 0;
+ 	int ret;
+ 
+-	if (!CONFIG_IS_ENABLED(DM_DMA) || !parent || !dev_has_ofnode(parent))
++	if (!CONFIG_IS_ENABLED(DM_DMA) || !parent)
++		return 0;
++
++	/* Look for the first node in the parent chain */
++	while (parent) {
++		if (dev_has_ofnode(parent))
++			break;
++
++		parent = dev_get_parent(parent);
++	}
++
++	/* No parents have a node, bail out */
++	if (!parent)
+ 		return 0;
+ 
+ 	/*
+
+From patchwork Fri Sep 25 00:56:17 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311212
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=MHMsBciN;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=140.211.166.136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [140.211.166.136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnh20hH7z1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:34 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 5FC0D60C23;
+	Fri, 25 Sep 2026 10:56:32 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id BjV8FwrICFe7; Fri, 25 Sep 2026 10:56:31 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org 1571760C30
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333791;
+	b=BCW4WO88pXUZ0O1D9dQ6t8E5eQmg2vT98wSHKXjjbodpGghubNYdXmMYVp/LxQViYY6B
+	 JWZ8XK46BxcXDlJZjjjkcUvPRQutkQkcpVp9H6LSw52vrS32VRjprTVNyAJUR6vrIXKTM
+	 GETob/LoRq+KnSQVyHPar/qKHeIRU2MzZVAT5nmHTr4fn0sC94ducxGpSd2D4reTz7QtF
+	 ywXiFbsGIfss/b3zI3jDfZbi+126AAqSElpBz7M/1JdFmQnEi1t6Hh3+meXTKkBAbjSEq
+	 bDQO3a8wNnfHhQQ0kpH5MLxRuKxFGukee1F+gAu7Uq3o+3m7zkNC9CzvQSwqahy3Q/g==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333791;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=nCc5WAnnmcPDUpOf0uRDU4K+ojtiFnnUU27MMqd/QOk=;
+	b=iYJb+iWb8fLKiRzHNsD+h6vLF6OlUJ/UNqwttI3S7U545sVhhWsP9pBNnxc2nflq8wTU
+	 djFMhjntoo4Qn9wSpvtv/3Wc8Dk0Pr4JDEDBQ9kgpbHfVW/vn/x0B+4afETmnsp3A3U3z
+	 /8ODrEYpzSMAVengLc6/jN2O8ZI9/9sD4y2C2ilYOBWOLw4NYZdRjO87plY0edclMDifQ
+	 47zJCqTM9jc7/JbrSl/tdrAxTlBz6EuHv8J+GpVApHeHbdQKkHcngNxDV/QcHrIuoLOZo
+	 fFaoKffKh10G5XHQoVIKJLe1C62nocsQvIrH2YUCDRKys5FFifuqypWmyK8IpD4XAwQ==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333791;
+	bh=nCc5WAnnmcPDUpOf0uRDU4K+ojtiFnnUU27MMqd/QOk=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=MHMsBciN1Sx0+SysmGl++sSa/SFsIAVYB3yDvwm3MIZ1RG+g9uByXvGE0aGu0BfHf
+	 yt1QgvQMBtXvgvdfup5LYCxovGF5G0fRta45zKUL0IQEkPSxzKnsv8gYP1NSez+p7N
+	 lSfGuUhTmMPKdCYRaczwOwwoIvr3H1L8wHXzXAiiskImkDklL7SmI8Ge2J5ruDVvj5
+	 X1ELZFPENtDzk0OFYJdnsvGPzvf7jMKAcbe5sI/PyUaqTxIHIiYO/qAHyF6Q6RJ+dA
+	 2tbAyKTujzrt6phnYtwXGfpmlp6bYYy7WkJUdElFhA0uK6YkBONfAhYKnewNPMayzQ
+	 BJWmFN87JNu5g==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 1571760C30;
+	Fri, 25 Sep 2026 10:56:31 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp2.osuosl.org (smtp2.osuosl.org [IPv6:2605:bc80:3010::133])
+ by lists1.osuosl.org (Postfix) with ESMTP id 6448DA33
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:28 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp2.osuosl.org (Postfix) with ESMTP id 553B7404EF
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:28 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp2.osuosl.org ([127.0.0.1])
+ by localhost (smtp2.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id Ly1epQ84Vowe for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:27 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp2.osuosl.org 62AEC4009F
+Authentication-Results: smtp2.osuosl.org; arc=none smtp.remote-ip=85.214.62.61
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333787;
+ b=LReYzaquDxd4tthbRQgFevxcoCJsd9CbucqqAKPEnnrm+iWHcsoD1cHWECtQg7pusg/n
+ AKEGc4c2Mi7DMcEEUTqkxHfmAgP891cFWxgjNMPMTvTeCtBhLdWNDN0Zxz/hooOSM0gXB
+ amz83Gatb8WXq9k8Qeso8uBMRb9TmONSj/i0GZjY6/PSboEEEoxpWJuJryAxlXa4WPx0U
+ JrDuIXVKSYDQz++e3RIaP+4i9Xlok/WMvL7UqP2Z+iWMMvwOvnWzirNSE8HZMkcys8fXI
+ 4UzqoGj9rLTQ0epTvPr3Wsh4cYEy/wmhiSnaQ4JtZGtfN5poFB4wpwmrksnhmLdJxsQ==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333787;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=nCc5WAnnmcPDUpOf0uRDU4K+ojtiFnnUU27MMqd/QOk=;
+ b=fYTZ1/UpS5t1ixifMh2bfzhB9X3ckJDH2QtWrNxvKQ4J74V8+aG1/vh1q0+6TY5DS3VN
+ YPPx4A5N8gOyLapwr3rBZHe4sM4ftCVzhYuuhXjVWFzV14xIpZ8OvXl7cdoZkjOy6/mQj
+ ucNYJ+BxQ40hmjAul14Gv3U0EsN1RUCRCP+WbQrPSBz60v6Il2FMLI3MO7kntsSdmNcR9
+ zeXXb9jLGHV8Ckhrh52yPSvrtAXLGVPVt+OsfRTO5df9m2vpHXN8IhGQ97FSrXYnW9+Ud
+ KECyYBk3kOEleDGemXUZsZUhPmEwr5pggOwsXeVTLR/1mk68G4ZhHrhJu3I8o/UPFBw==
+ARC-Authentication-Results: i=1; smtp2.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip=85.214.62.61
+X-Comment: SPF check N/A for local connections - client-ip=85.214.62.61;
+ helo=phobos.denx.de; envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp2.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp2.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+ by smtp2.osuosl.org (Postfix) with ESMTPS id 62AEC4009F
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:27 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id D7E3E847E7; Fri, 25 Sep 2026 12:56:25 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2374580117
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:20 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 71F7668C7B; Fri, 25 Sep 2026 12:56:17 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 2/8] test: add dma-ranges UT for dynamically created nodes
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105617.71F7668C7B@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:17 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+When devices were found using PCI(e) autoprobing, there is usually a
+connecting bus node as parent, and the device node itself, both
+created dynamically without a corresponding device tree node. If the
+device needs to do inbound PCI transfers, DM looks up the DMA mapping
+("dma-ranges") in the parent's DT node; but in this case there is
+none. Test whether DM is able to find the property on the grandparent
+node.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ arch/sandbox/dts/test.dts |  9 +++++++++
+ test/dm/ofnode.c          |  4 ++--
+ test/dm/phys2bus.c        | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 2 deletions(-)
+
+diff --git a/arch/sandbox/dts/test.dts b/arch/sandbox/dts/test.dts
+index d24feec5422..3ce52927fc5 100644
+--- a/arch/sandbox/dts/test.dts
++++ b/arch/sandbox/dts/test.dts
+@@ -656,6 +656,15 @@
+ 		subnode@0 {
+ 			compatible = "denx,u-boot-fdt-test";
+ 		};
++		bus@7 {
++			#address-cells = <1>;
++			#size-cells = <1>;
++			compatible = "denx,u-boot-test-bus";
++
++			subnode@8 {
++				  compatible = "denx,u-boot-fdt-test";
++			};
++		};
+ 	};
+ 
+ 	mmio-bus@1 {
+diff --git a/test/dm/ofnode.c b/test/dm/ofnode.c
+index 0f60c2a6281..d7bad2fa621 100644
+--- a/test/dm/ofnode.c
++++ b/test/dm/ofnode.c
+@@ -193,7 +193,7 @@ static int check_prop_values(struct unit_test_state *uts, ofnode start,
+ static int dm_test_ofnode_by_prop_value(struct unit_test_state *uts)
+ {
+ 	ut_assertok(check_prop_values(uts, ofnode_null(), "compatible",
+-				      "denx,u-boot-fdt-test", 11));
++				      "denx,u-boot-fdt-test", 12));
+ 
+ 	return 0;
+ }
+@@ -1263,7 +1263,7 @@ static int dm_test_ofnode_by_compatible(struct unit_test_state *uts)
+ 	for (node = ofnode_null();
+ 	     node = ofnode_by_compatible(node, compat), ofnode_valid(node);)
+ 		count++;
+-	ut_asserteq(11, count);
++	ut_asserteq(12, count);
+ 
+ 	return 0;
+ }
+diff --git a/test/dm/phys2bus.c b/test/dm/phys2bus.c
+index 67f33904943..3744a2eb928 100644
+--- a/test/dm/phys2bus.c
++++ b/test/dm/phys2bus.c
+@@ -31,6 +31,38 @@ static int dm_test_phys_to_bus(struct unit_test_state *uts)
+ 	ut_asserteq_addr((void*)0x1003ffffULL, (void*)dev_phys_to_bus(dev, 0x3ffff));
+ 	ut_asserteq_addr((void*)0x3ffffULL, (void*)(ulong)dev_bus_to_phys(dev, 0x1003ffff));
+ 
++#if CONFIG_IS_ENABLED(OF_REAL)
++	if (uts->of_live) {
++		/* DMA-ranges are to be found on the grandparent bus node,
++		 * DT nodes neither here nor at parent.
++		 */
++		struct udevice *pdev;
++		ofnode psave, nsave;
++
++		node = ofnode_path("/mmio-bus@0/bus@7");
++		ut_assert(ofnode_valid(node));
++		ut_assertok(uclass_get_device_by_ofnode(UCLASS_TEST_BUS, node, &pdev));
++
++		/* pretend the devices were discovered dynamically and have no DT node */
++		psave = pdev->node_;
++		pdev->node_.np = NULL;
++
++		node = ofnode_path("/mmio-bus@0/bus@7/subnode@8");
++		ut_assert(ofnode_valid(node));
++		ut_assertok(uclass_get_device_by_ofnode(UCLASS_TEST_FDT, node, &dev));
++
++		nsave = dev->node_;
++		dev->node_.np = NULL;
++
++		ut_asserteq_ptr((void *)0x1003ffffULL,
++				(void *)dev_phys_to_bus(dev, 0x3ffffULL));
++		ut_asserteq_ptr((void *)0x3ffffULL,
++				(void *)(ulong)dev_bus_to_phys(dev, 0x1003ffff));
++
++		pdev->node_ = psave;
++		dev->node_ = nsave;
++	}
++#endif
+ 	return 0;
+ }
+ DM_TEST(dm_test_phys_to_bus, UTF_SCAN_PDATA | UTF_SCAN_FDT);
+
+From patchwork Fri Sep 25 00:56:19 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311211
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=kvUeTga0;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrngz2sFNz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:31 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 07F0B606BD;
+	Fri, 25 Sep 2026 10:56:30 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id 31xl5YuJ2xci; Fri, 25 Sep 2026 10:56:29 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org 52A1C60BC2
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333789;
+	b=XLAjNMbNYQ/u+0F82xP+OT37hQdBHThgY6mRrKCtz3A2ZNh4y0TFZ8X0yPqdibJ2IO73
+	 xUv0huGXBf/6x6eYFlqz+B+rKmmYB4/b9w0hhcvxzGxtLDeD/Rak/OiVf/1Q1BNVCbKj4
+	 IX960WCgiHsPUT7ehUPInF9kEgOMwxPEfyK2EPddqeY9cUab+4oWFEfkKGAwPIZKBcOlR
+	 foMbL9DOw/VhgP/zPwvFayf3Ff9NXc20U+1zvFv0FWAB+4LB7DkxjVAU1kYt+uHFbW6O5
+	 z7doEVRby5DVHdBNn1U0kzpFTxJPW/jaxZDAXKHpWWCh/4vL/b3NTI9kDpwSW6JT4Jg==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333789;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=Za1wllnKHK69N24dGha4Vq17WDehQngxXEpezAH52r0=;
+	b=cfq6rek+DJpLwhYJm4urbQsUSu41kXzgBRB2ejmZRwTgaj8aVtXp60KD8rQkglJW6iQl
+	 id5UFHgVvDqFcrkIE52H3jYq4gB7Av9ENbEp3tlF4GxVVDf0TKlttNa9lk4zrHF3wB/Pj
+	 sZ3sbKxw06btSqAk6mZVNEP17B6Nf9iGwAH2+hLlN2+e0M6w3szQxxPnCdIntoCL89o1V
+	 J9fs1lgb/gcA1BF6Txgu5EjLz4gfpPbBSbJg/9JiUa32ZqNs1H1RHSDOoASH/IFcELis8
+	 kWPdpYBpHxEIsTrvFlgH4r65/obZR4C2JnYqdut1w3eq4/bzCSR9FMM6u/X1pDktXbQ==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333789;
+	bh=Za1wllnKHK69N24dGha4Vq17WDehQngxXEpezAH52r0=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=kvUeTga0MNsw4EAAE3JoSX58FyrnDCU5cq5mf04iSNbn5S2VEuz6j3IsRAVQwYqj5
+	 ef1kr8X3gi84516uaFl4niSmNVOvCza9vpifsb6DEdyMys+RotAWDU/WSpWfvM5ywf
+	 5NCsAqy+E/Gja1FVi+bTmpFf6viAsMh0QqGqEnlHFcMHN5BIg0zBgt9cS6C73Bb171
+	 O7v1zQIu2Ty7iVjrKvmHfCYOIBcnZAY5RRDns/WLVOCLkCVlYqqHCPMoYBtGBsWs/K
+	 v7pV3lcHKErIwoaVZ4g3ido3G5fveS9tkrr2BKTJ/n7buz4XEauBruHi2ktK9J40eQ
+	 /QG3IF80gz7ew==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 52A1C60BC2;
+	Fri, 25 Sep 2026 10:56:29 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp4.osuosl.org (smtp4.osuosl.org [IPv6:2605:bc80:3010::137])
+ by lists1.osuosl.org (Postfix) with ESMTP id 61CF5D1
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:28 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp4.osuosl.org (Postfix) with ESMTP id 4779A40B6A
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:28 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp4.osuosl.org ([127.0.0.1])
+ by localhost (smtp4.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id 2hFDtEUwBq-D for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:27 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp4.osuosl.org B85EF40AF5
+Authentication-Results: smtp4.osuosl.org; arc=none
+ smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333787;
+ b=AnFDTwoMbW4G2qHIRublOtv5gLoJc/0GsBdD5a3in3YLMz11tEeipwn4Zl/mrxOPJgSo
+ N3FrQ5oJb6JGUYNyuVrAHVBXlEfaWqd9o2duZU5XbQsK4IkxBCEGQH6mXavatcf+H+zxH
+ V+9Mvq/nvGXTN2ulSSJOhQp42JXDhBaX5GcYeoJz7oywj9cPdBGFajLotHX7oR8wPZUbr
+ qAXeAr3f+OOCCwyrOuEtKtK27+AE94KPOPHIBpQ4n6rC5O79o/+8SV+bRYnC9H+EBdfdW
+ 0bifUgBdlqQ+bBFAViJXSBKcERBOgxh9ysSXsjJB5OsDwUAcJEbiacrFHXXZ4PVqlmg==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333787;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=Za1wllnKHK69N24dGha4Vq17WDehQngxXEpezAH52r0=;
+ b=Lfl9U6Zj51uPDc0Mmp//Mx2jgI7naL8fMuS3z8TFzBRwyPRkFITLCbJIs5/visWUtHv+
+ Dk+SkqIye7c5YU1efMJKGc0wT9r3c02WQjd+OMv/uESUBUv3UZKkR/U9XimG8yHPo3bXz
+ C4CWySBS7EIKt4GLw2qRNBq4DodAPWk6w76K11ztZuU5LItPJqmFc4FFoh3aEkDsxae0M
+ 27V6fKqhKFoSkY2L6f9JEmZ1aXTBYwTPrR3KkK+mHiLjKvxm9xfzWdgjck09Tr6mOm7PX
+ 1q99n0FGqTzYNMik/A/kqXwI5DgtJhWpYDGcCNlBvlw8Nt1I84fqMqY0s7CSoL994aw==
+ARC-Authentication-Results: i=1; smtp4.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+X-Comment: SPF check N/A for local connections -
+ client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp4.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp4.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+ by smtp4.osuosl.org (Postfix) with ESMTPS id B85EF40AF5
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:26 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 019D8847E3; Fri, 25 Sep 2026 12:56:24 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2CC19847E5
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:22 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 991CE68CFE; Fri, 25 Sep 2026 12:56:19 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 3/8] configs: enable NVMe on RPi4 and RPi5
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105619.991CE68CFE@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:19 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+Enable NVMe in the Raspberry Pi 64-Bit default config and scan for devices.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Reviewed-by: Peter Robinson <pbrobinson@gmail.com>
+Tested-by: Peter Robinson <pbrobinson@gmail.com>
+Reviewed-by: Simon Glass <sjg@chromium.org>
+---
+ configs/rpi_arm64_defconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index cdcf05ea6db..fb0fdce1d7f 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -16,7 +16,7 @@ CONFIG_BOOTSTD_DEFAULTS=y
+ CONFIG_OF_BOARD_SETUP=y
+ CONFIG_FDT_SIMPLEFB=y
+ CONFIG_USE_PREBOOT=y
+-CONFIG_PREBOOT="pci enum; usb start;"
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_SYS_PBSIZE=1049
+ # CONFIG_DISPLAY_CPUINFO is not set
+ # CONFIG_DISPLAY_BOARDINFO is not set
+@@ -44,6 +44,7 @@ CONFIG_MMC_SDHCI_SDMA=y
+ CONFIG_MMC_SDHCI_BCM2835=y
+ CONFIG_MMC_SDHCI_BCMSTB=y
+ CONFIG_BCMGENET=y
++CONFIG_NVME_PCI=y
+ CONFIG_PCI_BRCMSTB=y
+ CONFIG_PINCTRL=y
+ # CONFIG_PINCTRL_GENERIC is not set
+
+From patchwork Fri Sep 25 00:56:21 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311213
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=fxrrjzVc;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnh51lppz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:37 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id BF2C960C30;
+	Fri, 25 Sep 2026 10:56:35 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id IediiO86ovvJ; Fri, 25 Sep 2026 10:56:34 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org 9E75360C27
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333794;
+	b=mN4f2hqaNPA4FWTBBqY/JOc+BEzRVBtrqsuFIZr/UKcMZiKqU/K9vc5UdYjuGULU6dk3
+	 ku5zm4RvtIHN+/PBy+JS23rLIUbtzig9X1vqhvB8Mj+PEwLVavtHMg1Ec6kM5V+kSNMuY
+	 m0dUI/Qzq7dyMHpRYBvOoQeOF7PmEIpLoKJOjgOjbYUK94MwFO/07Ie4jRZPQv2truwLD
+	 eOBCIhycxqT25QTPqYXdKpyKf4bEc1nW1Kf/3cev9hc6GT5QzFwR6y1fXcbJRTKn964Bi
+	 sQPBh9eT/6mK8rE0Xc0QNFhzJqci8eEj3GOYCTYfA04ekwiFfJ97kH68hIT0jWK2koQ==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333794;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=WE7y5LpMTUt2HzhbAnFiHNyaJrm7uZK5Mo5cU17sKZw=;
+	b=Hy5Fj9BRBI8i+6DvmHdtGMmWseru1E0BT7Ao21kpWAfcIpxRF7kidH3COAh6xuKPlntR
+	 8PEVEpmr68V20ieVZELniZ+4D94VoXc7DJ85HV/I38SpvFa2h3oD+KnuZJMGHM922xbU3
+	 fDwC7sSY+9Dmjcd3c5byJ9WP9SNDXFpsNgN9xn8Ve0QmqKYMn0MP4mLdrb5m2kh+9H9Jv
+	 khmn227LWZ+xrD7YmBdeE75sQ1LbIgpAXoDpQoez/zDZhAaAZpYbZpeWqQ1VVjBFsc/NM
+	 k6kRnQYLPn8Kg4RGb1S/oHwB3NhAFywvPMznqe4BLR3yv7HnjdeZVQeDps0VERSTKWw==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333794;
+	bh=WE7y5LpMTUt2HzhbAnFiHNyaJrm7uZK5Mo5cU17sKZw=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=fxrrjzVcamu5Z6FmGj5Dbj8chiS1zT6q81xcSJnvGpJfIECqRzgj8gSQHl3V9bzn/
+	 kWt/ovNcGL5amUGqHdsYHQvRfq1LXwNmotfRNuazPUMhAAjt6VFXdPaATua8sAkkwf
+	 NSGbU/4CI3WswjVcGji4H0x15IHn7476JLhUYJHC9JXIXXQweDo8nW6RzW51feT/Rf
+	 9wSkpN38j1EVaJcOKLdDYRDqS66CVFFc4+ZzYipiN9yQjKqoMetBsJZyfx8ifWjn6J
+	 fsPVdnB2o+SwBvbh/mA9yGuaBHLES2zOcv2icSdCzaKKfyhkgpdUBwdN1/etrydSkq
+	 Z8H7zOyOl3nOw==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 9E75360C27;
+	Fri, 25 Sep 2026 10:56:34 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp1.osuosl.org (smtp1.osuosl.org [IPv6:2605:bc80:3010::138])
+ by lists1.osuosl.org (Postfix) with ESMTP id 1B6F8A33
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:31 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp1.osuosl.org (Postfix) with ESMTP id 01C268128C
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:31 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp1.osuosl.org ([127.0.0.1])
+ by localhost (smtp1.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id n4-tPwiTOtKq for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:29 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp1.osuosl.org 3DA8D81285
+Authentication-Results: smtp1.osuosl.org; arc=none smtp.remote-ip=85.214.62.61
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333789;
+ b=rzNuZ+0vyauiQYZNN4MDs60n09IJrJGvURot4M/QibE7lSd/VOlsPkT79fmgSMovFJL+
+ BceB4a+dBe3BhAkIg5Fl4UCDSC/hiyFxiJjL+9SNAk1o1asTdL/4nd/jpYrGDjhtzke8H
+ Xtstar4jYgUp8oTlpYK8Bpf7GvOGriT17/7nlPADObzYU3fZt8UGz2CmD+ObDYk8arCRo
+ Tincb/Iwu5FvsTm0Seo+G3g2XVI7vwAVqrSi1Ajf8UmRCGu73CqA3j6K1k10Z8WywGmXn
+ SIMocTr6iUGEp/oNG/TTZtXLHPw9uTo/qQc3o6nOEeYbNmSq+8Jj/O8Nblam+rVlNhA==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333789;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=WE7y5LpMTUt2HzhbAnFiHNyaJrm7uZK5Mo5cU17sKZw=;
+ b=DGgQudTmyghP3z2t0oqoxsEaa+fmUyuV90Ttdhnu8prKjAI81CkAW/kRu6+Zn+cKneEM
+ cOFzGHbkx/hQWTVU/evz387qhghOtvhdJLm6Y8QTg4AjK70MX8PG9nsUt0H1tgqgagJTZ
+ 90movkDPSwBEBaly5EvTttQnsx9Wi+mllggWCom9Dk8ljbNEE0Q1u/zaS2It9FRiUl2c7
+ ksdGearqY3GP31/D6xNxybhBMs8z/RDP4jH0zofjKwweBLNleM9p0Km/xh/e5WKDTcyuV
+ lRe10q+YLusfS1xXel/EzbvBGuezvxH8zWwI0OtDTXxRVrKTHDgiVkMnPbLhW4kKuAg==
+ARC-Authentication-Results: i=1; smtp1.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip=85.214.62.61
+X-Comment: SPF check N/A for local connections - client-ip=85.214.62.61;
+ helo=phobos.denx.de; envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp1.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp1.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+ by smtp1.osuosl.org (Postfix) with ESMTPS id 3DA8D81285
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:28 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 2A4D180117; Fri, 25 Sep 2026 12:56:27 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id F2EA9847E5
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:24 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 3446968D07; Fri, 25 Sep 2026 12:56:21 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 4/8] clk: add support for RPi5 RP1 chip clk
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105622.3446968D07@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:21 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+Add a driver for the clocks in RP1, starting with ETH_TSU.
+Derived from Linux drivers/clk/clk-rp1.c.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Co-authored-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+---
+
+While not strictly required in this series, this patch completes a
+minimal RP1 support, as far as required for U-Boot. Network boot will
+later only need adaptions of the MACB ethernet code to the AXI and
+PCIe bridges.
+
+---
+ configs/rpi_arm64_defconfig   |   2 +
+ drivers/clk/Kconfig           |   7 +
+ drivers/clk/Makefile          |   1 +
+ drivers/clk/clk-rp1.c         | 280 ++++++++++++++++++++++++++++++++++
+ include/dt-bindings/clk/rp1.h |  56 +++++++
+ 5 files changed, 346 insertions(+)
+ create mode 100644 drivers/clk/clk-rp1.c
+ create mode 100644 include/dt-bindings/clk/rp1.h
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index fb0fdce1d7f..a4adfecfbe2 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -35,6 +35,8 @@ CONFIG_ENV_FAT_DEVICE_AND_PART="0:1"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_LWIP=y
+ CONFIG_DM_DMA=y
++CONFIG_CLK=y
++CONFIG_CLK_RP1=y
+ CONFIG_DFU_MMC=y
+ CONFIG_SYS_DFU_DATA_BUF_SIZE=0x100000
+ CONFIG_SYS_DFU_MAX_FILE_SIZE=0x200000
+diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
+index 47da49c8314..a7b5009a014 100644
+--- a/drivers/clk/Kconfig
++++ b/drivers/clk/Kconfig
+@@ -181,6 +181,13 @@ config CLK_OCTEON
+ 	help
+ 	  Enable this to support the clocks on Octeon MIPS platforms.
+ 
++config CLK_RP1
++	bool "Raspberry Pi RP1-based clock support"
++	depends on PCI && CLK
++	help
++	  Enable common clock framework support for Raspberry Pi RP1
++	  support.
++
+ config SANDBOX_CLK_CCF
+ 	bool "Sandbox Common Clock Framework [CCF] support"
+ 	depends on SANDBOX
+diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
+index 4b241a9240a..4467779fb79 100644
+--- a/drivers/clk/Makefile
++++ b/drivers/clk/Makefile
+@@ -63,3 +63,4 @@ obj-$(CONFIG_MACH_PIC32) += clk_pic32.o
+ obj-$(CONFIG_SANDBOX_CLK_CCF) += clk_sandbox_ccf.o
+ obj-$(CONFIG_SANDBOX) += clk_sandbox.o
+ obj-$(CONFIG_SANDBOX) += clk_sandbox_test.o
++obj-$(CONFIG_CLK_RP1) += clk-rp1.o
+diff --git a/drivers/clk/clk-rp1.c b/drivers/clk/clk-rp1.c
+new file mode 100644
+index 00000000000..94e12271345
+--- /dev/null
++++ b/drivers/clk/clk-rp1.c
+@@ -0,0 +1,280 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Clock driver for RP1 PCIe multifunction chip.
++ *
++ * Copyright (C) 2024 EPAM Systems
++ *
++ * Derived from linux clk-rp1 driver
++ *   Copyright (C) 2023 Raspberry Pi Ltd.
++ */
++
++#include <clk.h>
++#include <clk-uclass.h>
++#include <dm.h>
++#include <errno.h>
++#include <asm/io.h>
++#include <linux/bitops.h>
++#include <linux/clk-provider.h>
++#include <linux/math64.h>
++
++#include <dt-bindings/clk/rp1.h>
++
++#define GPCLK_OE_CTRL			0x00000
++
++#define CLK_ETH_TSU_CTRL		0x00134
++#define CLK_ETH_TSU_DIV_INT		0x00138
++#define CLK_ETH_TSU_SEL			0x00140
++
++#define FC_NUM(idx, off)		((idx) * 32 + (off))
++
++#define DIV_INT_8BIT_MAX		0x000000ffu /* max divide for most clocks */
++
++/* Clock fields for all clocks */
++#define CLK_CTRL_ENABLE			BIT(11)
++#define CLK_DIV_FRAC_BITS		16
++
++#define KHz				1000
++#define MHz				(KHz * KHz)
++
++#define MAX_CLK_PARENTS	16
++#define DIV_U64_NEAREST(a, b) div_u64(((a) + ((b) >> 1)), (b))
++
++struct rp1_clockman {
++	struct udevice *dev;
++	void __iomem *regs;
++	spinlock_t regs_lock; /* spinlock for all clocks */
++};
++
++struct rp1_pll_core_data {
++	const char *name;
++	u32 cs_reg;
++	u32 pwr_reg;
++	u32 fbdiv_int_reg;
++	u32 fbdiv_frac_reg;
++	unsigned long flags;
++	u32 fc0_src;
++};
++
++struct rp1_pll_data {
++	const char *name;
++	const char *source_pll;
++	u32 ctrl_reg;
++	unsigned long flags;
++	u32 fc0_src;
++};
++
++struct rp1_pll_ph_data {
++	const char *name;
++	const char *source_pll;
++	unsigned int phase;
++	unsigned int fixed_divider;
++	u32 ph_reg;
++	unsigned long flags;
++	u32 fc0_src;
++};
++
++struct rp1_pll_divider_data {
++	const char *name;
++	const char *source_pll;
++	u32 sec_reg;
++	unsigned long flags;
++	u32 fc0_src;
++};
++
++struct rp1_clock_data {
++	const char *name;
++	const char *const parents[MAX_CLK_PARENTS];
++	int num_std_parents;
++	int num_aux_parents;
++	unsigned long flags;
++	u32 oe_mask;
++	u32 clk_src_mask;
++	u32 ctrl_reg;
++	u32 div_int_reg;
++	u32 div_frac_reg;
++	u32 sel_reg;
++	u32 div_int_max;
++	unsigned long max_freq;
++	u32 fc0_src;
++};
++
++struct rp1_pll_core {
++	struct clk hw;
++	struct rp1_clockman *clockman;
++	const struct rp1_pll_core_data *data;
++	unsigned long cached_rate;
++};
++
++struct rp1_pll {
++	struct clk hw;
++	struct clk_divider div;
++	struct rp1_clockman *clockman;
++	const struct rp1_pll_data *data;
++	unsigned long cached_rate;
++};
++
++struct rp1_pll_ph {
++	struct clk hw;
++	struct rp1_clockman *clockman;
++	const struct rp1_pll_ph_data *data;
++};
++
++struct rp1_clock {
++	struct clk hw;
++	struct rp1_clockman *clockman;
++	const struct rp1_clock_data *data;
++	unsigned long cached_rate;
++};
++
++struct rp1_clk_change {
++	struct clk *hw;
++	unsigned long new_rate;
++};
++
++struct rp1_clk_change rp1_clk_chg_tree[3];
++
++static inline
++void clockman_write(struct rp1_clockman *clockman, u32 reg, u32 val)
++{
++	writel(val, clockman->regs + reg);
++}
++
++static inline u32 clockman_read(struct rp1_clockman *clockman, u32 reg)
++{
++	return readl(clockman->regs + reg);
++}
++
++static struct rp1_clock_data rp1_data[] = {
++[RP1_CLK_ETH_TSU] = {
++			.name = "clk_eth_tsu",
++			.parents = {"xosc",
++				    "pll_video_sec",
++				    "clksrc_gp0",
++				    "clksrc_gp1",
++				    "clksrc_gp2",
++				    "clksrc_gp3",
++				    "clksrc_gp4",
++				    "clksrc_gp5"},
++			.num_std_parents = 0,
++			.num_aux_parents = 8,
++			.ctrl_reg = CLK_ETH_TSU_CTRL,
++			.div_int_reg = CLK_ETH_TSU_DIV_INT,
++			.div_frac_reg = 0,
++			.sel_reg = CLK_ETH_TSU_SEL,
++			.div_int_max = DIV_INT_8BIT_MAX,
++			.max_freq = 50 * MHz,
++			.fc0_src = FC_NUM(5, 7),
++	},
++};
++
++static u32 rp1_clock_choose_div(unsigned long rate, unsigned long parent_rate,
++				const struct rp1_clock_data *data)
++{
++	u64 div;
++
++	/*
++	 * Due to earlier rounding, calculated parent_rate may differ from
++	 * expected value. Don't fail on a small discrepancy near unity divide.
++	 */
++	if (!rate || rate > parent_rate + (parent_rate >> CLK_DIV_FRAC_BITS))
++		return 0;
++
++	/*
++	 * Always express div in fixed-point format for fractional division;
++	 * If no fractional divider is present, the fraction part will be zero.
++	 */
++	if (data->div_frac_reg) {
++		div = (u64)parent_rate << CLK_DIV_FRAC_BITS;
++		div = DIV_U64_NEAREST(div, rate);
++	} else {
++		div = DIV_U64_NEAREST(parent_rate, rate);
++		div <<= CLK_DIV_FRAC_BITS;
++	}
++
++	div = clamp(div,
++		    1ull << CLK_DIV_FRAC_BITS,
++		    (u64)data->div_int_max << CLK_DIV_FRAC_BITS);
++
++	return div;
++}
++
++static ulong rp1_clock_set_rate(struct clk *hw, unsigned long rate)
++{
++	struct rp1_clockman *clockman = dev_get_priv(hw->dev);
++	const struct rp1_clock_data *data = &rp1_data[hw->id];
++	u32 div = rp1_clock_choose_div(rate, 0x2faf080, data);
++
++	if (hw->id != RP1_CLK_ETH_TSU)
++		return 0;
++
++	WARN(rate > 4000000000ll, "rate is -ve (%d)\n", (int)rate);
++
++	if (WARN(!div,
++		 "clk divider calculated as 0! (%s, rate %ld, parent rate %d)\n",
++		 data->name, rate, 0x2faf080))
++		div = 1 << CLK_DIV_FRAC_BITS;
++
++	spin_lock(&clockman->regs_lock);
++
++	clockman_write(clockman, data->div_int_reg, div >> CLK_DIV_FRAC_BITS);
++	if (data->div_frac_reg)
++		clockman_write(clockman, data->div_frac_reg, div << (32 - CLK_DIV_FRAC_BITS));
++
++	spin_unlock(&clockman->regs_lock);
++
++	return 0;
++}
++
++static int rp1_clock_on(struct clk *hw)
++{
++	const struct rp1_clock_data *data = &rp1_data[hw->id];
++	struct rp1_clockman *clockman = dev_get_priv(hw->dev);
++
++	if (hw->id != RP1_CLK_ETH_TSU)
++		return 0;
++
++	spin_lock(&clockman->regs_lock);
++	clockman_write(clockman, data->ctrl_reg,
++		       clockman_read(clockman, data->ctrl_reg) | CLK_CTRL_ENABLE);
++	/* If this is a GPCLK, turn on the output-enable */
++	if (data->oe_mask)
++		clockman_write(clockman, GPCLK_OE_CTRL,
++			       clockman_read(clockman, GPCLK_OE_CTRL) | data->oe_mask);
++
++	spin_unlock(&clockman->regs_lock);
++
++	return 0;
++}
++
++static int rp1_clk_probe(struct udevice *dev)
++{
++	struct rp1_clockman *clockman = dev_get_priv(dev);
++
++	spin_lock_init(&clockman->regs_lock);
++
++	clockman->regs = dev_remap_addr(dev);
++	if (!clockman->regs)
++		return -EINVAL;
++
++	return 0;
++}
++
++static const struct udevice_id rp1_clk_of_match[] = {
++	{ .compatible = "raspberrypi,rp1-clocks" },
++	{ /* sentinel */ }
++};
++
++static struct clk_ops rp1_clk_ops = {
++	.set_rate = rp1_clock_set_rate,
++	.enable = rp1_clock_on,
++};
++
++U_BOOT_DRIVER(clk_rp1) = {
++	.name = "rp1-clk",
++	.id = UCLASS_CLK,
++	.of_match = rp1_clk_of_match,
++	.probe = rp1_clk_probe,
++	.ops = &rp1_clk_ops,
++	.priv_auto	= sizeof(struct rp1_clockman),
++	.flags = CLK_IGNORE_UNUSED,
++};
+diff --git a/include/dt-bindings/clk/rp1.h b/include/dt-bindings/clk/rp1.h
+new file mode 100644
+index 00000000000..27cbb6e130d
+--- /dev/null
++++ b/include/dt-bindings/clk/rp1.h
+@@ -0,0 +1,56 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2021 Raspberry Pi Ltd.
++ */
++
++#define RP1_PLL_SYS_CORE		0
++#define RP1_PLL_AUDIO_CORE		1
++#define RP1_PLL_VIDEO_CORE		2
++
++#define RP1_PLL_SYS			3
++#define RP1_PLL_AUDIO			4
++#define RP1_PLL_VIDEO			5
++
++#define RP1_PLL_SYS_PRI_PH		6
++#define RP1_PLL_SYS_SEC_PH		7
++#define RP1_PLL_AUDIO_PRI_PH		8
++
++#define RP1_PLL_SYS_SEC			9
++#define RP1_PLL_AUDIO_SEC		10
++#define RP1_PLL_VIDEO_SEC		11
++
++#define RP1_CLK_SYS			12
++#define RP1_CLK_SLOW_SYS		13
++#define RP1_CLK_DMA			14
++#define RP1_CLK_UART			15
++#define RP1_CLK_ETH			16
++#define RP1_CLK_PWM0			17
++#define RP1_CLK_PWM1			18
++#define RP1_CLK_AUDIO_IN		19
++#define RP1_CLK_AUDIO_OUT		20
++#define RP1_CLK_I2S			21
++#define RP1_CLK_MIPI0_CFG		22
++#define RP1_CLK_MIPI1_CFG		23
++#define RP1_CLK_PCIE_AUX		24
++#define RP1_CLK_USBH0_MICROFRAME	25
++#define RP1_CLK_USBH1_MICROFRAME	26
++#define RP1_CLK_USBH0_SUSPEND		27
++#define RP1_CLK_USBH1_SUSPEND		28
++#define RP1_CLK_ETH_TSU			29
++#define RP1_CLK_ADC			30
++#define RP1_CLK_SDIO_TIMER		31
++#define RP1_CLK_SDIO_ALT_SRC		32
++#define RP1_CLK_GP0			33
++#define RP1_CLK_GP1			34
++#define RP1_CLK_GP2			35
++#define RP1_CLK_GP3			36
++#define RP1_CLK_GP4			37
++#define RP1_CLK_GP5			38
++#define RP1_CLK_VEC			39
++#define RP1_CLK_DPI			40
++#define RP1_CLK_MIPI0_DPI		41
++#define RP1_CLK_MIPI1_DPI		42
++
++/* Extra PLL output channels - RP1B0 only */
++#define RP1_PLL_VIDEO_PRI_PH		43
++#define RP1_PLL_AUDIO_TERN		44
+
+From patchwork Fri Sep 25 00:56:24 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311214
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=nPqS4PrA;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnhB0fmQz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:42 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 8865860D70;
+	Fri, 25 Sep 2026 10:56:40 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id WveEwKxeqAj8; Fri, 25 Sep 2026 10:56:37 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org CBBC260D65
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333797;
+	b=SN4pBffIPCsGMw1FoOZAUxR7pBcVZNF57tUNwVDCDLjDFDFU4QNL+cRvHfh9Ep/27bcj
+	 1+p/L0fnMgH+XxHv0SjkKLhW8J1ktE14d1eG8g11qwvP7+1EouPEGrDuWzjU+O/5fYn6M
+	 TstWq3zl4e8VC4FW49qPSO8lN6Ekpw+5/wPuNcOnslyb+QcacDmeSrwMGghWjUod+jXuE
+	 Jqy1dnYyJqH54NltrmGlrkCXD63rkFGm4mByxJUGvP9bnerNEr6cMH/8EZtl/ctpGKs/G
+	 jfCvq8YfvHBNKZteqvIrGxITDIFUgwPef/toruzlJ04VgjrdYT4e+ndQQ76p3saS5qw==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333797;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=Vw4iF5ElYCTexufLhM1/lIpaOu1cnOdpZv8vJdI5X9o=;
+	b=R60gh14Ml6kfMwcOxepIQ3IgBSTseVdtXPiDaisEW6Fif+sLb1QanQ8xDkyKGIps6BuA
+	 aqSr8AoAOSmRvyhSZ8dxQMHoiPi45GvSPc8xybESQ8bdgTfbqGVb+vX6fPIDaJXJYjGUJ
+	 SkrPQTfZbfMZslf8mJuy8qEhYCg3Rj9EckKldnUOVojvqwiiEPzR7EQGaJipeIMnMzDEh
+	 8dpgx4qjbhymDdfZdwxMi0bGNrZnINgs7BYtS0IqmqK/C6tdvrGf+7c9AT/SlPU4zexHe
+	 ZkXqYsQ1En7mZgf7N9aZvo/AqWp2zoryzznKlYO/X8RpyWH7YwIC5S9okns77sUWGDA==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333796;
+	bh=Vw4iF5ElYCTexufLhM1/lIpaOu1cnOdpZv8vJdI5X9o=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=nPqS4PrAJlWQXIBfGyghJzRuTtCXaYHIt5bHp1n4vqsrv7pYENlDF8NRvB/EsueDV
+	 KnIUz8nagINxUbAutm2tkFKO6xKFwbWCCcsnZAhPZc+H3OGzrEYa80nYE6Q4ttQPoC
+	 GbLtF53Lu+kcJtMEMrTh2RsVyHsom4q6/Z+tC2n5OYyLgeg5k6WteH/VHyuCIId2bg
+	 hQ/j42LtTsF6tuFrhqukDvBJjEx5K6m6onK7vfh6aKb1w90708QIq+MBBxrEQJCCy4
+	 0vPMKcjcAQsKx0eGM8ZJ93kFcBpr/DxCui28eVcbWF1A19DOf0OeZ+cDRjfhVf/UPU
+	 pietzXroSIr/w==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id CBBC260D65;
+	Fri, 25 Sep 2026 10:56:36 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp2.osuosl.org (smtp2.osuosl.org [IPv6:2605:bc80:3010::133])
+ by lists1.osuosl.org (Postfix) with ESMTP id D800932F
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:33 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp2.osuosl.org (Postfix) with ESMTP id CA1534009F
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:33 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp2.osuosl.org ([127.0.0.1])
+ by localhost (smtp2.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id Q4h86t18PFIu for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:32 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp2.osuosl.org 6F9D3404EF
+Authentication-Results: smtp2.osuosl.org; arc=none
+ smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333792;
+ b=ln68ydQOwHBp4zDvPVJvuoaT9Opju4tr47lEz8Z2r3anfQ2kSo+xs0ZeJTSAzDBnr9VS
+ YahDHBZTELyIlzqWaCO/mcUg16n3PhaQwJ8BvmpQJ1jm/FIcDAYXFtw+B2CPrLajWYcbW
+ Mq1z/eB5UkCTD1i4tvplFuQTlzXc9MpjATOew2XP41JM6UyS2MkjzK10b+Ni/ncmBEBnA
+ 3pCGwt1Y+pJGfELf8VZAJFCtw6zEEIvWu1+/IoGDTlvVx00/ZAT1V56i4dFSR6o1r0zIM
+ Ha+7EW0c9XVJ2KByhG0IaHOLWSngMvOncVWjGAQfjUTSjVVXRXId8ksHJDAje7TIdjQ==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333792;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=Vw4iF5ElYCTexufLhM1/lIpaOu1cnOdpZv8vJdI5X9o=;
+ b=CJMf75hOmZ6zE4zbIA4cwGsxd6u18LriCAkjo+mgKF/1hI4hUWMSRfhR+j0jg4AVBvdB
+ UoM/uy/Rna8eZ40P3JRZGOXPn06JxVtKZHGGehoJd4/cmTY0RXzOU119TFToqXn2oXcYR
+ bLnosZQEz9+glVEklW+4T9pi4X6fYsiML7YUdF+3nnzQM6OjqirzYsl+2Zq2Tku2gJwgO
+ S3DfiiRvsk6u3UgXWKkxzvhpCzwHFL/tDae/ur6WAjfBIjydmHxBMa++TmGG6CHCR+b44
+ jqjiacH6un4Eisp6iZaA2RbcFtvTLGP+fb2N2vGUNdieOOsMj2bbVYT6sYHTirggWxQ==
+ARC-Authentication-Results: i=1; smtp2.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+X-Comment: SPF check N/A for local connections -
+ client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp2.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp2.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+ by smtp2.osuosl.org (Postfix) with ESMTPS id 6F9D3404EF
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:31 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 5C133847E6; Fri, 25 Sep 2026 12:56:30 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 6D07F846A4
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:27 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id AADAE68D09; Fri, 25 Sep 2026 12:56:24 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 5/8] gpio: add support for RPi5 RP1 chip GPIO
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105624.AADAE68D09@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:24 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+RP1 GPIO driver, derived from Linux drivers/pinctrl/pinctrl-rp1.c;
+mainly stripped the pins' alternate function handling and fine-grained
+driving current controls.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Co-authored-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+---
+ configs/rpi_arm64_defconfig |   1 +
+ drivers/gpio/Kconfig        |   7 +
+ drivers/gpio/Makefile       |   1 +
+ drivers/gpio/rp1_gpio.c     | 374 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 383 insertions(+)
+ create mode 100644 drivers/gpio/rp1_gpio.c
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index a4adfecfbe2..81a5311e16a 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -41,6 +41,7 @@ CONFIG_DFU_MMC=y
+ CONFIG_SYS_DFU_DATA_BUF_SIZE=0x100000
+ CONFIG_SYS_DFU_MAX_FILE_SIZE=0x200000
+ CONFIG_BCM2835_GPIO=y
++CONFIG_RP1_GPIO=y
+ CONFIG_MMC_SDHCI=y
+ CONFIG_MMC_SDHCI_SDMA=y
+ CONFIG_MMC_SDHCI_BCM2835=y
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+index a11f3043670..7afbe177637 100644
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -413,6 +413,13 @@ config RCAR_GPIO
+ 	help
+ 	  This driver supports the GPIO banks on Renesas R-Car SoCs.
+ 
++config RP1_GPIO
++	bool "Raspberry PR1 GPIO driver"
++	help
++	  This driver supports the GPIO banks on Raspberry RP1 chip.
++	  Raspberry PI5 has an external chip RP1 installed, which
++	  provides it's own GPIO controller.
++
+ config RZA1_GPIO
+ 	bool "Renesas RZ/A1 GPIO driver"
+ 	depends on DM_GPIO && RZA1
+diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+index 020e23c7252..5346df64dba 100644
+--- a/drivers/gpio/Makefile
++++ b/drivers/gpio/Makefile
+@@ -35,6 +35,7 @@ obj-$(CONFIG_NPCM_SGPIO)	+= npcm_sgpio.o
+ obj-$(CONFIG_PCA953X)		+= pca953x.o
+ obj-$(CONFIG_ROCKCHIP_GPIO)	+= rk_gpio.o
+ obj-$(CONFIG_RCAR_GPIO)		+= gpio-rcar.o
++obj-$(CONFIG_RP1_GPIO)		+= rp1_gpio.o
+ obj-$(CONFIG_RZA1_GPIO)		+= gpio-rza1.o
+ obj-$(CONFIG_S5P)		+= s5p_gpio.o
+ obj-$(CONFIG_SANDBOX_GPIO)	+= sandbox.o sandbox_test.o
+diff --git a/drivers/gpio/rp1_gpio.c b/drivers/gpio/rp1_gpio.c
+new file mode 100644
+index 00000000000..a64af18fcf6
+--- /dev/null
++++ b/drivers/gpio/rp1_gpio.c
+@@ -0,0 +1,374 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2024 EPAM Systems
++ *
++ * Derived from linux/drivers/pinctrl/pinctl-rp1.c
++ * Copyright (C) 2023 Raspberry Pi Ltd.
++ */
++
++#include <dm.h>
++#include <errno.h>
++#include <asm/gpio.h>
++#include <asm/io.h>
++#include <linux/bitops.h>
++
++#define RP1_NUM_GPIOS	54
++#define RP1_NUM_BANKS	3
++
++#define RP1_RW_OFFSET			0x0000
++#define RP1_XOR_OFFSET			0x1000
++#define RP1_SET_OFFSET			0x2000
++#define RP1_CLR_OFFSET			0x3000
++
++#define RP1_GPIO_STATUS			0x0000
++#define RP1_GPIO_CTRL			0x0004
++
++#define RP1_GPIO_PCIE_INTE		0x011c
++#define RP1_GPIO_PCIE_INTS		0x0124
++
++#define RP1_GPIO_EVENTS_SHIFT_RAW	20
++#define RP1_GPIO_STATUS_FALLING		BIT(20)
++#define RP1_GPIO_STATUS_RISING		BIT(21)
++#define RP1_GPIO_STATUS_LOW		BIT(22)
++#define RP1_GPIO_STATUS_HIGH		BIT(23)
++
++#define RP1_GPIO_EVENTS_SHIFT_FILTERED	24
++#define RP1_GPIO_STATUS_F_FALLING	BIT(24)
++#define RP1_GPIO_STATUS_F_RISING	BIT(25)
++#define RP1_GPIO_STATUS_F_LOW		BIT(26)
++#define RP1_GPIO_STATUS_F_HIGH		BIT(27)
++
++#define RP1_GPIO_CTRL_FUNCSEL_LSB	0
++#define RP1_GPIO_CTRL_FUNCSEL_MASK	0x0000001f
++#define RP1_GPIO_CTRL_OUTOVER_LSB	12
++#define RP1_GPIO_CTRL_OUTOVER_MASK	0x00003000
++#define RP1_GPIO_CTRL_OEOVER_LSB	14
++#define RP1_GPIO_CTRL_OEOVER_MASK	0x0000c000
++#define RP1_GPIO_CTRL_INOVER_LSB	16
++#define RP1_GPIO_CTRL_INOVER_MASK	0x00030000
++#define RP1_GPIO_CTRL_IRQEN_FALLING	BIT(20)
++#define RP1_GPIO_CTRL_IRQEN_RISING	BIT(21)
++#define RP1_GPIO_CTRL_IRQEN_LOW		BIT(22)
++#define RP1_GPIO_CTRL_IRQEN_HIGH	BIT(23)
++#define RP1_GPIO_CTRL_IRQEN_F_FALLING	BIT(24)
++#define RP1_GPIO_CTRL_IRQEN_F_RISING	BIT(25)
++#define RP1_GPIO_CTRL_IRQEN_F_LOW	BIT(26)
++#define RP1_GPIO_CTRL_IRQEN_F_HIGH	BIT(27)
++#define RP1_GPIO_CTRL_IRQRESET		BIT(28)
++#define RP1_GPIO_CTRL_IRQOVER_LSB	30
++#define RP1_GPIO_CTRL_IRQOVER_MASK	0xc0000000
++
++#define RP1_PUD_OFF			0
++#define RP1_PUD_DOWN			1
++#define RP1_PUD_UP			2
++
++#define RP1_FSEL_COUNT			9
++
++#define RP1_FSEL_ALT0			0x00
++#define RP1_FSEL_GPIO			0x05
++#define RP1_FSEL_NONE			0x09
++#define RP1_FSEL_NONE_HW		0x1f
++
++#define RP1_DIR_OUTPUT			0
++#define RP1_DIR_INPUT			1
++
++#define RP1_OUTOVER_PERI		0
++#define RP1_OUTOVER_INVPERI		1
++#define RP1_OUTOVER_LOW			2
++#define RP1_OUTOVER_HIGH		3
++
++#define RP1_OEOVER_PERI			0
++#define RP1_OEOVER_INVPERI		1
++#define RP1_OEOVER_DISABLE		2
++#define RP1_OEOVER_ENABLE		3
++
++#define RP1_INOVER_PERI			0
++#define RP1_INOVER_INVPERI		1
++#define RP1_INOVER_LOW			2
++#define RP1_INOVER_HIGH			3
++
++#define RP1_RIO_OUT			0x00
++#define RP1_RIO_OE			0x04
++#define RP1_RIO_IN			0x08
++
++#define RP1_PAD_SLEWFAST_MASK		0x00000001
++#define RP1_PAD_SLEWFAST_LSB		0
++#define RP1_PAD_SCHMITT_MASK		0x00000002
++#define RP1_PAD_SCHMITT_LSB		1
++#define RP1_PAD_PULL_MASK		0x0000000c
++#define RP1_PAD_PULL_LSB		2
++#define RP1_PAD_DRIVE_MASK		0x00000030
++#define RP1_PAD_DRIVE_LSB		4
++#define RP1_PAD_IN_ENABLE_MASK		0x00000040
++#define RP1_PAD_IN_ENABLE_LSB		6
++#define RP1_PAD_OUT_DISABLE_MASK	0x00000080
++#define RP1_PAD_OUT_DISABLE_LSB		7
++
++#define RP1_PAD_DRIVE_2MA		0x00000000
++#define RP1_PAD_DRIVE_4MA		0x00000010
++#define RP1_PAD_DRIVE_8MA		0x00000020
++#define RP1_PAD_DRIVE_12MA		0x00000030
++
++#define FLD_GET(r, f) (((r) & (f ## _MASK)) >> (f ## _LSB))
++#define FLD_SET(r, f, v) r = (((r) & ~(f ## _MASK)) | ((v) << (f ## _LSB)))
++
++struct rp1_iobank_desc {
++	int min_gpio;
++	int num_gpios;
++	int gpio_offset;
++	int inte_offset;
++	int ints_offset;
++	int rio_offset;
++	int pads_offset;
++};
++
++const struct rp1_iobank_desc rp1_iobanks[RP1_NUM_BANKS] = {
++	/*         gpio   inte    ints     rio    pads */
++	{  0, 28, 0x0000, 0x011c, 0x0124, 0x0000, 0x0004 },
++	{ 28,  6, 0x4000, 0x411c, 0x4124, 0x4000, 0x4004 },
++	{ 34, 20, 0x8000, 0x811c, 0x8124, 0x8000, 0x8004 },
++};
++
++struct rp1_pin_info {
++	u8 num;
++	u8 bank;
++	u8 offset;
++	u8 fsel;
++
++	void __iomem *gpio;
++	void __iomem *rio;
++	void __iomem *inte;
++	void __iomem *ints;
++	void __iomem *pad;
++};
++
++struct rp1_gpio_priv {
++	void __iomem *gpio_base;
++	void __iomem *rio_base;
++	void __iomem *pads_base;
++
++	struct rp1_pin_info pins[RP1_NUM_GPIOS];
++};
++
++static struct rp1_pin_info *rp1_get_pin(struct udevice *dev,
++					unsigned int offset)
++{
++	struct rp1_gpio_priv *priv = dev_get_priv(dev);
++
++	if (priv && offset < RP1_NUM_GPIOS)
++		return &priv->pins[offset];
++
++	return NULL;
++}
++
++static void rp1_pad_update(struct rp1_pin_info *pin, u32 clr, u32 set)
++{
++	u32 padctrl = readl(pin->pad);
++
++	padctrl &= ~clr;
++	padctrl |= set;
++
++	writel(padctrl, pin->pad);
++}
++
++static void rp1_input_enable(struct rp1_pin_info *pin, int value)
++{
++	rp1_pad_update(pin, RP1_PAD_IN_ENABLE_MASK,
++		       value ? RP1_PAD_IN_ENABLE_MASK : 0);
++}
++
++static void rp1_output_enable(struct rp1_pin_info *pin, int value)
++{
++	rp1_pad_update(pin, RP1_PAD_OUT_DISABLE_MASK,
++		       value ? 0 : RP1_PAD_OUT_DISABLE_MASK);
++}
++
++static u32 rp1_get_fsel(struct rp1_pin_info *pin)
++{
++	u32 ctrl = readl(pin->gpio + RP1_GPIO_CTRL);
++	u32 oeover = FLD_GET(ctrl, RP1_GPIO_CTRL_OEOVER);
++	u32 fsel = FLD_GET(ctrl, RP1_GPIO_CTRL_FUNCSEL);
++
++	if (oeover != RP1_OEOVER_PERI || fsel >= RP1_FSEL_COUNT)
++		fsel = RP1_FSEL_NONE;
++
++	return fsel;
++}
++
++static void rp1_set_fsel(struct rp1_pin_info *pin, u32 fsel)
++{
++	u32 ctrl = readl(pin->gpio + RP1_GPIO_CTRL);
++
++	if (fsel >= RP1_FSEL_COUNT)
++		fsel = RP1_FSEL_NONE_HW;
++
++	rp1_input_enable(pin, 1);
++	rp1_output_enable(pin, 1);
++
++	if (fsel == RP1_FSEL_NONE) {
++		FLD_SET(ctrl, RP1_GPIO_CTRL_OEOVER, RP1_OEOVER_DISABLE);
++	} else {
++		FLD_SET(ctrl, RP1_GPIO_CTRL_OUTOVER, RP1_OUTOVER_PERI);
++		FLD_SET(ctrl, RP1_GPIO_CTRL_OEOVER, RP1_OEOVER_PERI);
++	}
++	FLD_SET(ctrl, RP1_GPIO_CTRL_FUNCSEL, fsel);
++
++	writel(ctrl, pin->gpio + RP1_GPIO_CTRL);
++}
++
++static int rp1_get_dir(struct rp1_pin_info *pin)
++{
++	return !(readl(pin->rio + RP1_RIO_OE) & (1 << pin->offset)) ?
++		RP1_DIR_INPUT : RP1_DIR_OUTPUT;
++}
++
++static void rp1_set_dir(struct rp1_pin_info *pin, bool is_input)
++{
++	int offset = is_input ? RP1_CLR_OFFSET : RP1_SET_OFFSET;
++
++	writel(1 << pin->offset, pin->rio + RP1_RIO_OE + offset);
++}
++
++static int rp1_get_value(struct rp1_pin_info *pin)
++{
++	return !!(readl(pin->rio + RP1_RIO_IN) & (1 << pin->offset));
++}
++
++static void rp1_set_value(struct rp1_pin_info *pin, int value)
++{
++	/* Assume the pin is already an output */
++	writel(1 << pin->offset,
++	       pin->rio + RP1_RIO_OUT + (value ? RP1_SET_OFFSET : RP1_CLR_OFFSET));
++}
++
++static int rp1_gpio_get(struct udevice *dev, unsigned int offset)
++{
++	struct rp1_pin_info *pin = rp1_get_pin(dev, offset);
++	int ret;
++
++	if (!pin)
++		return -EINVAL;
++
++	ret = rp1_get_value(pin);
++	return ret;
++}
++
++static int rp1_gpio_set(struct udevice *dev, unsigned int offset, int value)
++{
++	struct rp1_pin_info *pin = rp1_get_pin(dev, offset);
++
++	if (pin)
++		rp1_set_value(pin, value);
++
++	return 0;
++}
++
++static int rp1_gpio_direction_input(struct udevice *dev, unsigned int offset)
++{
++	struct rp1_pin_info *pin = rp1_get_pin(dev, offset);
++
++	if (!pin)
++		return -EINVAL;
++
++	rp1_set_dir(pin, RP1_DIR_INPUT);
++	rp1_set_fsel(pin, RP1_FSEL_GPIO);
++	return 0;
++}
++
++static int rp1_gpio_direction_output(struct udevice *dev, unsigned int offset, int value)
++{
++	struct rp1_pin_info *pin = rp1_get_pin(dev, offset);
++
++	if (!pin)
++		return -EINVAL;
++
++	rp1_set_value(pin, value);
++	rp1_set_dir(pin, RP1_DIR_OUTPUT);
++	rp1_set_fsel(pin, RP1_FSEL_GPIO);
++	return 0;
++}
++
++static int rp1_gpio_get_direction(struct udevice *dev, unsigned int offset)
++{
++	struct rp1_pin_info *pin = rp1_get_pin(dev, offset);
++	u32 fsel;
++
++	if (!pin)
++		return -EINVAL;
++
++	fsel = rp1_get_fsel(pin);
++	if (fsel != RP1_FSEL_GPIO)
++		return -EINVAL;
++
++	return (rp1_get_dir(pin) == RP1_DIR_OUTPUT) ?
++			GPIOF_OUTPUT :
++			GPIOF_INPUT;
++}
++
++static const struct dm_gpio_ops rp1_gpio_ops = {
++	.direction_input = rp1_gpio_direction_input,
++	.direction_output = rp1_gpio_direction_output,
++	.get_value = rp1_gpio_get,
++	.set_value = rp1_gpio_set,
++	.get_function = rp1_gpio_get_direction,
++};
++
++static int rp1_gpio_probe(struct udevice *dev)
++{
++	int i;
++	struct gpio_dev_priv *uc_priv = dev_get_uclass_priv(dev);
++	struct rp1_gpio_priv *priv = dev_get_priv(dev);
++
++	priv->gpio_base = dev_remap_addr_index(dev, 0);
++	if (!priv->gpio_base)
++		return -EINVAL;
++
++	priv->rio_base = dev_remap_addr_index(dev, 1);
++	if (!priv->rio_base)
++		return -EINVAL;
++
++	priv->pads_base = dev_remap_addr_index(dev, 2);
++	if (!priv->pads_base)
++		return -EINVAL;
++
++	uc_priv->gpio_count = RP1_NUM_GPIOS;
++	uc_priv->bank_name = dev->name;
++
++	for (i = 0; i < RP1_NUM_BANKS; i++) {
++		const struct rp1_iobank_desc *bank = &rp1_iobanks[i];
++		int j;
++
++		for (j = 0; j < bank->num_gpios; j++) {
++			struct rp1_pin_info *pin =
++				&priv->pins[bank->min_gpio + j];
++
++			pin->num = bank->min_gpio + j;
++			pin->bank = i;
++			pin->offset = j;
++
++			pin->gpio = priv->gpio_base + bank->gpio_offset +
++				    j * sizeof(u32) * 2;
++			pin->inte = priv->gpio_base + bank->inte_offset;
++			pin->ints = priv->gpio_base + bank->ints_offset;
++			pin->rio  = priv->rio_base + bank->rio_offset;
++			pin->pad  = priv->pads_base + bank->pads_offset +
++				    j * sizeof(u32);
++		}
++	}
++
++	return 0;
++}
++
++static const struct udevice_id rp1_gpio_ids[] = {
++	{ .compatible = "raspberrypi,rp1-gpio" },
++	{ /* sentinel */ }
++};
++
++U_BOOT_DRIVER(rp1_gpio) = {
++	.name = "rp1-gpio",
++	.id = UCLASS_GPIO,
++	.of_match = rp1_gpio_ids,
++	.ops = &rp1_gpio_ops,
++	.priv_auto	= sizeof(struct rp1_gpio_priv),
++	.probe = rp1_gpio_probe,
++};
+
+From patchwork Fri Sep 25 00:56:27 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311215
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=lE+VQr7Q;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnhH1Xkjz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:47 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id A4F5260C09;
+	Fri, 25 Sep 2026 10:56:45 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id EHYvJRENpQ_u; Fri, 25 Sep 2026 10:56:40 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org D370E60D6D
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333800;
+	b=CbHtZLogP9y9bp7APvVPrskQgcH1TIqdCeKVkF0wTwZ3BDlqaOmORqsn23SLpMSjQUGE
+	 0VSxE98cWj/W+b8oorQzCmVE2jZVqVX8lCC7pOwztWx1EUzqIGAPI9kXNuawZTMDbvif4
+	 7CF/xZ27M3XAQ5q3mvxMhG++hjlh2kzOXOZJQG35isWHw9Y/+M4Wr+WcC690BXDsNLGlF
+	 8fEQWqfMZmtiut78AmM4KsElKRSeqCufvQofE/XbA+Fn/TNF7IV0jGb17FJah7QA7C18W
+	 38+6u/mViTywF0csjR0m5HDus7IhH+9ETe/9sujcpNhGPMRJFfSyz5Gb33/LERqYkow==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333800;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=hhcqZfXWpuB72O8JYgAqSqfNvcl8filZLoKK0Qra1cQ=;
+	b=cdsb4VgLjCWfwAdWcjiW/h+SlxR4iXjA8E3q71buVLzEycLCqJSZPruK90H88BMrHlIV
+	 CYhUWS6YDrH69Yi5hOG62EsgbPJ2n3z7V19GY4Z1Dk7H2jQYtgc3oj0jjz0Nhw5jOQDUk
+	 +mkoNCuc67/fUK44CSDBKj5tXPBZ8g3eTbCNPRHiSijyGI2GhnowiwPJogmxL3FUOZSv+
+	 i1crsFHaZaYQj2FzJx8d89OLZIoLEpIz9139mCjZTbX0NiEf+uPzyNgjZ/RLJNQkI1feL
+	 Lss9ubVeSd/Ks0Nw/UouaPbAGW5xLGbq27Xx5n78gdJ52bI9wJuJ8YFRxy2jrti5cYQ==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333799;
+	bh=hhcqZfXWpuB72O8JYgAqSqfNvcl8filZLoKK0Qra1cQ=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=lE+VQr7QLMBXYqpsSTF61how7qjIpvS9t4m2TqZ6oGMWaoYKaDx9iA5h9nZm0cz+B
+	 J0YlArox7LTd/K0jqlHfDcMfMwFkxk33bFDFSrS/QiHDNi/DOuA57B0mFNLoDxJtTv
+	 d/M+htQ/op5eUP9DYuiJTCispSDntRfkyDTJrsIRN3Nbxm9XQvZW6scD9Ur2T9L5OP
+	 OmSvqEivrZrYNXSX77Y8tgtkd6G+ySv7thAFSBDb/i6TwXEgeFui4GM5u6j/+ZdNjC
+	 gA/I5H2S9PJwbTtarJklKG12AqojhHCi0h+xaKmQ6GVtcuRrXIAVlrKqQSYi4BRAT5
+	 rujQUUFNvJfMw==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id D370E60D6D;
+	Fri, 25 Sep 2026 10:56:39 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp4.osuosl.org (smtp4.osuosl.org [140.211.166.137])
+ by lists1.osuosl.org (Postfix) with ESMTP id 0680D2F5
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:36 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp4.osuosl.org (Postfix) with ESMTP id DED3840B6A
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:35 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp4.osuosl.org ([127.0.0.1])
+ by localhost (smtp4.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id mYsGQ3Sf8SqF for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:35 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp4.osuosl.org 8674740AF5
+Authentication-Results: smtp4.osuosl.org; arc=none smtp.remote-ip=85.214.62.61
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333794;
+ b=SyqAxLUYbmK7CMMsDAVCYk0APUDmQ5V6ob3r1td+q2ZL8lzMQ7wZ/A+KyOmlaavRA16D
+ DdhHla2M/Q9SZlDqp8LP7b2pjLjoAz7jE6LZIE8dtxUjXbC+KaQ2E2hbR1utGISDK4tYd
+ vmMXzN1q40h576xv+i9eb45Zws+erSLJD+Q9mAK2L+sFd7OR4bFzO0zwMwl+i1UUJQh/J
+ pfaukxnODiFMr1HuHPcEK/jRQmOO8DO/yOQ6qto/zPcG4iy0vDWsgrUengRxWacLgI4VV
+ oR41V2JHhryl3V/qE5EIGYwQxRl0nPukqlC5/ibBW0LkGNpYklOgqvgHN2W+hbIRmRw==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333794;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=hhcqZfXWpuB72O8JYgAqSqfNvcl8filZLoKK0Qra1cQ=;
+ b=R5s7LeQmcA7DifVitjaEnyxBtaFI3eDq/Kz0ec8+R+EbN8kBwg8VehX2LuGfi2e9QTRN
+ 69ZNLyHzT3HVKP4g/kKBkmPv7VJ/Lrj8eJGkzzCx3hWSuioX3RwKrXZ5GIBnIt7k+S4oA
+ TSZkVBOrLxox2QiaiSEkqDtMxj6tPeZoJMkAoZLVg4Wz04uZIMzXMC1KfezGDia1pwFq5
+ R8QEnRRfirz7YMbh5YJ+G3v75nnuhZQdN800AWA7S4jTyiLZmVG5jd61KFChXGBhEsGWq
+ /XzIB5JiL5z9iIVWBbLKGDa12eL2qeDaZ+Od+jwuslWMq9Q47zd19BJl8zFLzfhKiIw==
+ARC-Authentication-Results: i=1; smtp4.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip=85.214.62.61
+X-Comment: SPF check N/A for local connections - client-ip=85.214.62.61;
+ helo=phobos.denx.de; envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp4.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp4.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+ by smtp4.osuosl.org (Postfix) with ESMTPS id 8674740AF5
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:34 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 31D02846A4; Fri, 25 Sep 2026 12:56:32 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id BDF4380117
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:29 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 70D9668C4E; Fri, 25 Sep 2026 12:56:27 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 6/8] mfd: add support for RPi5 RP1 chip MFD
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105627.70D9668C4E@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:27 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+MFD base driver for the RP1 chip, similar to Linux'
+drivers/misc/rp1/rp1_pci.c
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Co-authored-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Tested-by: Simon Glass <sjg@chromium.org>  # rpi5
+---
+
+Note that with interrupt code removed and U-Boot specifics added,
+there is not much similarity, actually.
+
+---
+ configs/rpi_arm64_defconfig   |   1 +
+ drivers/mfd/Kconfig           |  10 ++
+ drivers/mfd/Makefile          |   1 +
+ drivers/mfd/rp1.c             | 127 +++++++++++++++++++
+ include/dt-bindings/mfd/rp1.h | 239 ++++++++++++++++++++++++++++++++++
+ include/pci_ids.h             |   3 +
+ 6 files changed, 388 insertions(+)
+ create mode 100644 drivers/mfd/rp1.c
+ create mode 100644 include/dt-bindings/mfd/rp1.h
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index 81a5311e16a..fcd37cb4fc9 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -42,6 +42,7 @@ CONFIG_SYS_DFU_DATA_BUF_SIZE=0x100000
+ CONFIG_SYS_DFU_MAX_FILE_SIZE=0x200000
+ CONFIG_BCM2835_GPIO=y
+ CONFIG_RP1_GPIO=y
++CONFIG_MFD_RP1=y
+ CONFIG_MMC_SDHCI=y
+ CONFIG_MMC_SDHCI_SDMA=y
+ CONFIG_MMC_SDHCI_BCM2835=y
+diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+index 79f4db9849c..c22dfdb806b 100644
+--- a/drivers/mfd/Kconfig
++++ b/drivers/mfd/Kconfig
+@@ -2,3 +2,13 @@ config MFD_ATMEL_SMC
+ 	bool "Atmel Static Memory Controller driver"
+ 	help
+ 	  Say yes here to support Atmel Static Memory Controller driver.
++
++config MFD_RP1
++	tristate "RP1 MFD driver"
++	depends on PCI
++	help
++	  Support for the RP1 peripheral chip.
++
++	  This driver provides support for the Raspberry Pi RP1 peripheral chip.
++	  It is responsible for enabling the Device Tree node once the PCIe endpoint
++	  has been configureds.
+diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+index 4454815a981..c81ee5789b5 100644
+--- a/drivers/mfd/Makefile
++++ b/drivers/mfd/Makefile
+@@ -1 +1,2 @@
+ obj-$(CONFIG_MFD_ATMEL_SMC) += atmel-smc.o
++obj-$(CONFIG_MFD_RP1) += rp1.o
+diff --git a/drivers/mfd/rp1.c b/drivers/mfd/rp1.c
+new file mode 100644
+index 00000000000..5cb6249c055
+--- /dev/null
++++ b/drivers/mfd/rp1.c
+@@ -0,0 +1,127 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2024 EPAM Systems
++ *
++ * Derived from linux rp1 driver
++ * Copyright (c) 2018-22 Raspberry Pi Ltd.
++ */
++
++#include <asm/io.h>
++#include <dm.h>
++#include <dm/device_compat.h>
++#include <dm/of_access.h>
++#include <dt-bindings/mfd/rp1.h>
++#include <linux/io.h>
++#include <linux/types.h>
++#include <pci.h>
++
++#define RP1_B0_CHIP_ID 0x10001927
++#define RP1_C0_CHIP_ID 0x20001927
++
++#define RP1_PLATFORM_ASIC BIT(1)
++#define RP1_PLATFORM_FPGA BIT(0)
++
++#define RP1_DRIVER_NAME "rp1"
++
++#define PCI_DEVICE_REV_RP1_C0 2
++
++#define SYSINFO_CHIP_ID_OFFSET	0x00000000
++#define SYSINFO_PLATFORM_OFFSET	0x00000004
++
++struct rp1_dev {
++	phys_addr_t bar_start;
++};
++
++static inline dma_addr_t rp1_io_to_phys(struct rp1_dev *rp1, unsigned int offset)
++{
++	return rp1->bar_start + offset;
++}
++
++static u32 rp1_reg_read(struct rp1_dev *rp1, unsigned int base_addr, u32 offset)
++{
++	resource_size_t phys = rp1_io_to_phys(rp1, base_addr);
++	void __iomem *regblock = ioremap(phys, 0x1000);
++	u32 value = readl(regblock + offset);
++
++	iounmap(regblock);
++	return value;
++}
++
++static int rp1_get_bar_region(struct udevice *dev, phys_addr_t *bar_start)
++{
++	*bar_start = (phys_addr_t)dm_pci_map_bar(dev, PCI_BASE_ADDRESS_1, 0, 0,
++			PCI_REGION_TYPE, PCI_REGION_MEM);
++	return 0;
++}
++
++static int rp1_probe(struct udevice *dev)
++{
++	int ret;
++	struct rp1_dev *rp1 = dev_get_priv(dev);
++	u32 chip_id, platform;
++
++	/* Turn on bus-mastering */
++	dm_pci_clrset_config16(dev, PCI_COMMAND, 0, PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY);
++
++	/*
++	 * HACK: Set bar address in the correct order.
++	 * Required for correct U-Boot operation.
++	 */
++	dm_pci_write_config32(dev, PCI_BASE_ADDRESS_1, 0);
++	dm_pci_write_config32(dev, PCI_BASE_ADDRESS_0, 0x40000);
++
++	ret = rp1_get_bar_region(dev, &rp1->bar_start);
++	if (ret)
++		return ret;
++
++	/* Get chip id */
++	chip_id = rp1_reg_read(rp1, RP1_SYSINFO_BASE, SYSINFO_CHIP_ID_OFFSET);
++	platform = rp1_reg_read(rp1, RP1_SYSINFO_BASE, SYSINFO_PLATFORM_OFFSET);
++	dev_dbg(dev, "chip_id 0x%x%s\n", chip_id,
++		(platform & RP1_PLATFORM_FPGA) ? " FPGA" : "");
++
++	if (chip_id != RP1_C0_CHIP_ID) {
++		dev_err(dev, "wrong chip id (%x)\n", chip_id);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int rp1_bind(struct udevice *dev)
++{
++	device_set_name(dev, RP1_DRIVER_NAME);
++	return 0;
++}
++
++static const struct pci_device_id dev_id_table[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_RPI, PCI_DEVICE_ID_RPI_RP1_C0), },
++	{ 0, }
++};
++
++static int rp1_pcie_read_config(const struct udevice *bus, pci_dev_t bdf,
++				uint offset, ulong *valuep, enum pci_size_t size)
++{
++	/*
++	 * Leaving this call because pci subsystem calls for read_config
++	 * and produces error then this callback is not set.
++	 * Just return 0 here.s
++	 */
++	*valuep = 0;
++	return 0;
++}
++
++static const struct dm_pci_ops rp1_pcie_ops = {
++	.read_config	= rp1_pcie_read_config,
++};
++
++U_BOOT_DRIVER(rp1_driver) = {
++	.name			= RP1_DRIVER_NAME,
++	.id			= UCLASS_PCI_GENERIC,
++	.probe			= rp1_probe,
++	.bind			= rp1_bind,
++	.priv_auto		= sizeof(struct rp1_dev),
++	.ops			= &rp1_pcie_ops,
++};
++
++U_BOOT_PCI_DEVICE(rp1_driver, dev_id_table);
+diff --git a/include/dt-bindings/mfd/rp1.h b/include/dt-bindings/mfd/rp1.h
+new file mode 100644
+index 00000000000..fca5729deb6
+--- /dev/null
++++ b/include/dt-bindings/mfd/rp1.h
+@@ -0,0 +1,239 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * This header provides constants for the PY MFD.
++ *
++ * Copyright (c) 2024 EPAM Systems
++ *
++ * Derived from linux rp1.h.
++ */
++
++#ifndef _RP1_H
++#define _RP1_H
++
++/* Address map */
++#define RP1_SYSINFO_BASE 0x000000
++#define RP1_TBMAN_BASE 0x004000
++#define RP1_SYSCFG_BASE 0x008000
++#define RP1_OTP_BASE 0x00c000
++#define RP1_POWER_BASE 0x010000
++#define RP1_RESETS_BASE 0x014000
++#define RP1_CLOCKS_BANK_DEFAULT_BASE 0x018000
++#define RP1_CLOCKS_BANK_VIDEO_BASE 0x01c000
++#define RP1_PLL_SYS_BASE 0x020000
++#define RP1_PLL_AUDIO_BASE 0x024000
++#define RP1_PLL_VIDEO_BASE 0x028000
++#define RP1_UART0_BASE 0x030000
++#define RP1_UART1_BASE 0x034000
++#define RP1_UART2_BASE 0x038000
++#define RP1_UART3_BASE 0x03c000
++#define RP1_UART4_BASE 0x040000
++#define RP1_UART5_BASE 0x044000
++#define RP1_SPI8_BASE 0x04c000
++#define RP1_SPI0_BASE 0x050000
++#define RP1_SPI1_BASE 0x054000
++#define RP1_SPI2_BASE 0x058000
++#define RP1_SPI3_BASE 0x05c000
++#define RP1_SPI4_BASE 0x060000
++#define RP1_SPI5_BASE 0x064000
++#define RP1_SPI6_BASE 0x068000
++#define RP1_SPI7_BASE 0x06c000
++#define RP1_I2C0_BASE 0x070000
++#define RP1_I2C1_BASE 0x074000
++#define RP1_I2C2_BASE 0x078000
++#define RP1_I2C3_BASE 0x07c000
++#define RP1_I2C4_BASE 0x080000
++#define RP1_I2C5_BASE 0x084000
++#define RP1_I2C6_BASE 0x088000
++#define RP1_AUDIO_IN_BASE 0x090000
++#define RP1_AUDIO_OUT_BASE 0x094000
++#define RP1_PWM0_BASE 0x098000
++#define RP1_PWM1_BASE 0x09c000
++#define RP1_I2S0_BASE 0x0a0000
++#define RP1_I2S1_BASE 0x0a4000
++#define RP1_I2S2_BASE 0x0a8000
++#define RP1_TIMER_BASE 0x0ac000
++#define RP1_SDIO0_APBS_BASE 0x0b0000
++#define RP1_SDIO1_APBS_BASE 0x0b4000
++#define RP1_BUSFABRIC_MONITOR_BASE 0x0c0000
++#define RP1_BUSFABRIC_AXISHIM_BASE 0x0c4000
++#define RP1_ADC_BASE 0x0c8000
++#define RP1_IO_BANK0_BASE 0x0d0000
++#define RP1_IO_BANK1_BASE 0x0d4000
++#define RP1_IO_BANK2_BASE 0x0d8000
++#define RP1_SYS_RIO0_BASE 0x0e0000
++#define RP1_SYS_RIO1_BASE 0x0e4000
++#define RP1_SYS_RIO2_BASE 0x0e8000
++#define RP1_PADS_BANK0_BASE 0x0f0000
++#define RP1_PADS_BANK1_BASE 0x0f4000
++#define RP1_PADS_BANK2_BASE 0x0f8000
++#define RP1_PADS_ETH_BASE 0x0fc000
++#define RP1_ETH_IP_BASE 0x100000
++#define RP1_ETH_CFG_BASE 0x104000
++#define RP1_PCIE_APBS_BASE 0x108000
++#define RP1_MIPI0_CSIDMA_BASE 0x110000
++#define RP1_MIPI0_CSIHOST_BASE 0x114000
++#define RP1_MIPI0_DSIDMA_BASE 0x118000
++#define RP1_MIPI0_DSIHOST_BASE 0x11c000
++#define RP1_MIPI0_MIPICFG_BASE 0x120000
++#define RP1_MIPI0_ISP_BASE 0x124000
++#define RP1_MIPI1_CSIDMA_BASE 0x128000
++#define RP1_MIPI1_CSIHOST_BASE 0x12c000
++#define RP1_MIPI1_DSIDMA_BASE 0x130000
++#define RP1_MIPI1_DSIHOST_BASE 0x134000
++#define RP1_MIPI1_MIPICFG_BASE 0x138000
++#define RP1_MIPI1_ISP_BASE 0x13c000
++#define RP1_VIDEO_OUT_CFG_BASE 0x140000
++#define RP1_VIDEO_OUT_VEC_BASE 0x144000
++#define RP1_VIDEO_OUT_DPI_BASE 0x148000
++#define RP1_XOSC_BASE 0x150000
++#define RP1_WATCHDOG_BASE 0x154000
++#define RP1_DMA_TICK_BASE 0x158000
++#define RP1_SDIO_CLOCKS_BASE 0x15c000
++#define RP1_USBHOST0_APBS_BASE 0x160000
++#define RP1_USBHOST1_APBS_BASE 0x164000
++#define RP1_ROSC0_BASE 0x168000
++#define RP1_ROSC1_BASE 0x16c000
++#define RP1_VBUSCTRL_BASE 0x170000
++#define RP1_TICKS_BASE 0x174000
++#define RP1_PIO_APBS_BASE 0x178000
++#define RP1_SDIO0_AHBLS_BASE 0x180000
++#define RP1_SDIO1_AHBLS_BASE 0x184000
++#define RP1_DMA_BASE 0x188000
++#define RP1_RAM_BASE 0x1c0000
++#define RP1_RAM_SIZE 0x020000
++#define RP1_USBHOST0_AXIS_BASE 0x200000
++#define RP1_USBHOST1_AXIS_BASE 0x300000
++#define RP1_EXAC_BASE 0x400000
++
++/* Interrupts */
++
++#define RP1_INT_IO_BANK0 0
++#define RP1_INT_IO_BANK1 1
++#define RP1_INT_IO_BANK2 2
++#define RP1_INT_AUDIO_IN 3
++#define RP1_INT_AUDIO_OUT 4
++#define RP1_INT_PWM0 5
++#define RP1_INT_ETH 6
++#define RP1_INT_I2C0 7
++#define RP1_INT_I2C1 8
++#define RP1_INT_I2C2 9
++#define RP1_INT_I2C3 10
++#define RP1_INT_I2C4 11
++#define RP1_INT_I2C5 12
++#define RP1_INT_I2C6 13
++#define RP1_INT_I2S0 14
++#define RP1_INT_I2S1 15
++#define RP1_INT_I2S2 16
++#define RP1_INT_SDIO0 17
++#define RP1_INT_SDIO1 18
++#define RP1_INT_SPI0 19
++#define RP1_INT_SPI1 20
++#define RP1_INT_SPI2 21
++#define RP1_INT_SPI3 22
++#define RP1_INT_SPI4 23
++#define RP1_INT_SPI5 24
++#define RP1_INT_UART0 25
++#define RP1_INT_TIMER_0 26
++#define RP1_INT_TIMER_1 27
++#define RP1_INT_TIMER_2 28
++#define RP1_INT_TIMER_3 29
++#define RP1_INT_USBHOST0 30
++#define RP1_INT_USBHOST0_0 31
++#define RP1_INT_USBHOST0_1 32
++#define RP1_INT_USBHOST0_2 33
++#define RP1_INT_USBHOST0_3 34
++#define RP1_INT_USBHOST1 35
++#define RP1_INT_USBHOST1_0 36
++#define RP1_INT_USBHOST1_1 37
++#define RP1_INT_USBHOST1_2 38
++#define RP1_INT_USBHOST1_3 39
++#define RP1_INT_DMA 40
++#define RP1_INT_PWM1 41
++#define RP1_INT_UART1 42
++#define RP1_INT_UART2 43
++#define RP1_INT_UART3 44
++#define RP1_INT_UART4 45
++#define RP1_INT_UART5 46
++#define RP1_INT_MIPI0 47
++#define RP1_INT_MIPI1 48
++#define RP1_INT_VIDEO_OUT 49
++#define RP1_INT_PIO_0 50
++#define RP1_INT_PIO_1 51
++#define RP1_INT_ADC_FIFO 52
++#define RP1_INT_PCIE_OUT 53
++#define RP1_INT_SPI6 54
++#define RP1_INT_SPI7 55
++#define RP1_INT_SPI8 56
++#define RP1_INT_SYSCFG 58
++#define RP1_INT_CLOCKS_DEFAULT 59
++#define RP1_INT_VBUSCTRL 60
++#define RP1_INT_PROC_MISC 57
++#define RP1_INT_END 61
++
++/* DMA peripherals (for pacing) */
++#define RP1_DMA_I2C0_RX 0x0
++#define RP1_DMA_I2C0_TX 0x1
++#define RP1_DMA_I2C1_RX 0x2
++#define RP1_DMA_I2C1_TX 0x3
++#define RP1_DMA_I2C2_RX 0x4
++#define RP1_DMA_I2C2_TX 0x5
++#define RP1_DMA_I2C3_RX 0x6
++#define RP1_DMA_I2C3_TX 0x7
++#define RP1_DMA_I2C4_RX 0x8
++#define RP1_DMA_I2C4_TX 0x9
++#define RP1_DMA_I2C5_RX 0xa
++#define RP1_DMA_I2C5_TX 0xb
++#define RP1_DMA_SPI0_RX 0xc
++#define RP1_DMA_SPI0_TX 0xd
++#define RP1_DMA_SPI1_RX 0xe
++#define RP1_DMA_SPI1_TX 0xf
++#define RP1_DMA_SPI2_RX 0x10
++#define RP1_DMA_SPI2_TX 0x11
++#define RP1_DMA_SPI3_RX 0x12
++#define RP1_DMA_SPI3_TX 0x13
++#define RP1_DMA_SPI4_RX 0x14
++#define RP1_DMA_SPI4_TX 0x15
++#define RP1_DMA_SPI5_RX 0x16
++#define RP1_DMA_SPI5_TX 0x17
++#define RP1_DMA_PWM0 0x18
++#define RP1_DMA_UART0_RX 0x19
++#define RP1_DMA_UART0_TX 0x1a
++#define RP1_DMA_AUDIO_IN_CH0 0x1b
++#define RP1_DMA_AUDIO_IN_CH1 0x1c
++#define RP1_DMA_AUDIO_OUT 0x1d
++#define RP1_DMA_PWM1 0x1e
++#define RP1_DMA_I2S0_RX 0x1f
++#define RP1_DMA_I2S0_TX 0x20
++#define RP1_DMA_I2S1_RX 0x21
++#define RP1_DMA_I2S1_TX 0x22
++#define RP1_DMA_I2S2_RX 0x23
++#define RP1_DMA_I2S2_TX 0x24
++#define RP1_DMA_UART1_RX 0x25
++#define RP1_DMA_UART1_TX 0x26
++#define RP1_DMA_UART2_RX 0x27
++#define RP1_DMA_UART2_TX 0x28
++#define RP1_DMA_UART3_RX 0x29
++#define RP1_DMA_UART3_TX 0x2a
++#define RP1_DMA_UART4_RX 0x2b
++#define RP1_DMA_UART4_TX 0x2c
++#define RP1_DMA_UART5_RX 0x2d
++#define RP1_DMA_UART5_TX 0x2e
++#define RP1_DMA_ADC 0x2f
++#define RP1_DMA_DMA_TICK_TICK0 0x30
++#define RP1_DMA_DMA_TICK_TICK1 0x31
++#define RP1_DMA_SPI6_RX 0x32
++#define RP1_DMA_SPI6_TX 0x33
++#define RP1_DMA_SPI7_RX 0x34
++#define RP1_DMA_SPI7_TX 0x35
++#define RP1_DMA_SPI8_RX 0x36
++#define RP1_DMA_SPI8_TX 0x37
++#define RP1_DMA_PIO_CH0_TX 0x38
++#define RP1_DMA_PIO_CH0_RX 0x39
++#define RP1_DMA_PIO_CH1_TX 0x3a
++#define RP1_DMA_PIO_CH1_RX 0x3b
++#define RP1_DMA_PIO_CH2_TX 0x3c
++#define RP1_DMA_PIO_CH2_RX 0x3d
++#define RP1_DMA_PIO_CH3_TX 0x3e
++#define RP1_DMA_PIO_CH3_RX 0x3f
++
++#endif
+diff --git a/include/pci_ids.h b/include/pci_ids.h
+index cfff275daba..4651b1c003e 100644
+--- a/include/pci_ids.h
++++ b/include/pci_ids.h
+@@ -2555,6 +2555,9 @@
+ #define PCI_VENDOR_ID_TEKRAM		0x1de1
+ #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
+ 
++#define PCI_VENDOR_ID_RPI		0x1de4
++#define PCI_DEVICE_ID_RPI_RP1_C0		0x0001
++
+ #define PCI_VENDOR_ID_TEHUTI		0x1fc9
+ #define PCI_DEVICE_ID_TEHUTI_3009	0x3009
+ #define PCI_DEVICE_ID_TEHUTI_3010	0x3010
+
+From patchwork Fri Sep 25 00:56:30 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311216
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=Kjk2s7Ap;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnhJ6yxDz1xyS
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:48 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 18BFD60D95;
+	Fri, 25 Sep 2026 10:56:47 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id OoEthqSwgFUf; Fri, 25 Sep 2026 10:56:44 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org EA60F60D78
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333802;
+	b=EIDGsaoiaRs5fs6D8/ysEe/Pypfw1c+b0SXlwcMHsF/85q+G2EmYlz7KMjfQhSH7WNLh
+	 OauLCcz5mQNsjQ/nLr194GbmLuPC26bChbVMXgHeNuTPbemXYAmIeVNdSvWHv+l7s8Ysl
+	 0fapsOGndO6CekZ6r20MXvL/2UG6yfZj2CFF9QsWhHlZG3GJtARJgldYHAAeXG7vklpIO
+	 0xCrnK16FM6WagdjgxMeZNgJHbZTLJXWuvds7fuwLfkvq/H1uuRir2KJT5rWx0u6FD6Ma
+	 yf+zuEcWzMk/yaWOsfB2mxBYZVvgKQaXSzfL/9s8/giPsfNdcOyrm3/FJsOevFAby1g==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333802;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=GvyAmarp1DPF2M3HdCsqCbvI7wjsJuYP3reZ853S0pM=;
+	b=De6uu4R3jv7K6gZaplVtAB3/HxNLe+eJr3iT2zpzrwWFXTQQ/bJ7S3NYvHvCLoZxP7zd
+	 ps4HlYs4C9B0FJHMf7aATfYmimRjCOyj2aXlyn7ZH9XPbjIk8c4rbwnUl/i8Q2gBtET13
+	 lkSwLIqrnInQuYhrWLPcTGeeYr6XzQr2abx0peXKNiSWQ2C1+osdzjXi+JCiKlJ1U4Xw9
+	 OpaK5km44nqAbM1h9QG2CvXXtF6/f+Yl/ufsJ66bigjHek3LApTvPGOUyd8cjWEL8dmhP
+	 Imjg2r/q6pn7al9/hLG7kvwYXyMkH9MI0N0CAd8JhWSBDj4Jb8T5by4TgVIdD4cmzeA==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333802;
+	bh=GvyAmarp1DPF2M3HdCsqCbvI7wjsJuYP3reZ853S0pM=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=Kjk2s7ApFHspqS94WwqIjFxdWQ0v7J7KKTsRKfZTC++gziWIFXIRiu+op4MiwPY7+
+	 1VHZ58sFs2uHtZb9cdBHr8kF0PsP39DRGm60Wlz5J3o+bMk1Z76Tfy+3n+iXQDDOat
+	 9SVWm7KBJ8ApoxYD2jNw/v7R36UjDgWBe03uaovnq5apRt8CeJLfSvYbH5riVGqhsJ
+	 NlfjV2LZ/eSp0q/I6PfX+Q2HQnogOtrzTBIqLSCT723jVcARTaOEOdZY0L9C2bVw4f
+	 zJI1ukqeX1Z6QUDmkHfzFU9Nmq+GhuxCUxMe5eRI6ApRiQHqhy5l1opHib1b+vt62C
+	 jSnGa5p9gcorQ==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id EA60F60D78;
+	Fri, 25 Sep 2026 10:56:41 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp4.osuosl.org (smtp4.osuosl.org [IPv6:2605:bc80:3010::137])
+ by lists1.osuosl.org (Postfix) with ESMTP id F3CEFD1
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:37 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp4.osuosl.org (Postfix) with ESMTP id E5ECA40B6A
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:37 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp4.osuosl.org ([127.0.0.1])
+ by localhost (smtp4.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id s9HkcJ2m5xqJ for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:37 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp4.osuosl.org 0ACDF40AF5
+Authentication-Results: smtp4.osuosl.org; arc=none
+ smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333797;
+ b=RUtQaQbawQgH3hKDGLqeem8g3pFH3Nbestlgo1+p49v9net8iXkTPuobBIkMlz62tBPp
+ y7pZXOkUZBXCEFPdr0zjuh9wvVVqeeujNGMOi79pz5Wz+ue8GcJpLNqN0rjXiBPnRxtn0
+ 70bWf5okdOKLd75LfoHkl5d8PwQVk8Z6H77J6L9F5egW72McIUTfQQSTU8sKG90HeAvi4
+ dpIrLG0iIoSr+kAlqbeJZ23W+NgpVF1cBo7irYBZ4PU8pamEFwX2yqVdYe2eoJrfQhUNp
+ a+9nPC2eAPbiZ8GOR4tEd0W4Lp5vptPuB1K2CNlxPvidBu5YPJorr+k/sh0wITMdc6Q==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333797;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=GvyAmarp1DPF2M3HdCsqCbvI7wjsJuYP3reZ853S0pM=;
+ b=JOsZSoiL8mTRpFdCJA5tZID6KFO99NfdN039fOO/jHki7nKdqc3HYClM+BvMAAJibEsH
+ T6ZscuMVOLYBOjsIKTpfZ7IWM+V7+yhLrRLGVdEREwy9T7HNtVm/I9SKv4annAev3X28y
+ hAobEDBHTd51IbiyrPgC8JzPeMQXxMqCBMMSk02TifZMqxVlIHNWyHFSORc4KtwQqSe73
+ 51Ns46WreaH8/a/wAac1KhWSzASIncM/H52yPJwTRzkHcr8WCYVkMyEV/h3V7qvVhzlgt
+ 63yx/DdEQP8LOmtfyMwHrpw0oLsglwcSu695aVxky+Inlu5WF8pKZkd7byyjb/2V0lQ==
+ARC-Authentication-Results: i=1; smtp4.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+X-Comment: SPF check N/A for local connections -
+ client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp4.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp4.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+ by smtp4.osuosl.org (Postfix) with ESMTPS id 0ACDF40AF5
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:36 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 67BB6847E5; Fri, 25 Sep 2026 12:56:34 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 8E38B80117
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:32 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 2D9F368D0A; Fri, 25 Sep 2026 12:56:30 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 7/8] board: raspberrypi: use board_late_init to probe RP1 chip
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105630.2D9F368D0A@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:30 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+During device tree parsing, u-boot finds the PCIe root complexes.
+Thereafter, a pci scan finds the RP1 chip, but does not really
+deal with it properly, while the device tree probably holds the
+description for the RP1 "nexus" or similar. Use board_late_init
+to attach any such FDT fragments to the RP1 found.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Co-authored-by: Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+---
+ board/raspberrypi/rpi/rpi.c | 15 +++++++++++++++
+ configs/rpi_arm64_defconfig |  1 +
+ 2 files changed, 16 insertions(+)
+
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index 1da5df92351..792aacdacb9 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -566,6 +566,21 @@ int board_init(void)
+ 	return bcm2835_power_on_module(BCM2835_MBOX_POWER_DEVID_USB_HCD);
+ }
+ 
++int board_late_init(void)
++{
++	struct udevice *dev;
++	int err;
++
++	err = dm_pci_find_device(PCI_VENDOR_ID_RPI, PCI_DEVICE_ID_RPI_RP1_C0,
++				 0, &dev);
++	if (err)
++		printf("RPI: RP1 device not found\n");
++	else
++		dm_scan_fdt_dev(dev);
++
++	return 0;
++}
++
+ /*
+  * If the firmware passed a device tree use it for U-Boot.
+  */
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index fcd37cb4fc9..67b5311d4a6 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -20,6 +20,7 @@ CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_SYS_PBSIZE=1049
+ # CONFIG_DISPLAY_CPUINFO is not set
+ # CONFIG_DISPLAY_BOARDINFO is not set
++CONFIG_BOARD_LATE_INIT=y
+ CONFIG_MISC_INIT_R=y
+ CONFIG_SYS_PROMPT="U-Boot> "
+ CONFIG_CMD_NVEDIT_EFI=y
+
+From patchwork Fri Sep 25 00:56:33 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2311217
+X-Patchwork-Delegate: pbrobinson@gmail.com
+Return-Path: <u-boot-bounces@lists.u-boot-project.org>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=lists.u-boot-project.org
+ header.i=@lists.u-boot-project.org
+ header.a=rsa-sha256 header.s=default header.b=T/1+Bf7h;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.u-boot-project.org
+ (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org;
+ receiver=patchwork.ozlabs.org)
+Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4hrnhK3qC4z1yGD
+	for <incoming@patchwork.ozlabs.org>; Fri, 25 Sep 2026 20:56:49 +1000 (AEST)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 5887460D96;
+	Fri, 25 Sep 2026 10:56:47 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp3.osuosl.org ([127.0.0.1])
+ by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id sZOXYXoPNDoF; Fri, 25 Sep 2026 10:56:46 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp3.osuosl.org 929A960D7B
+Authentication-Results: smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+ARC-Seal: i=2; d=osuosl.org; s=arc; a=rsa-sha256; cv=fail; t=1790333803;
+	b=K5/etzBES+KqjrqczsTQF0P6Bt3dH9bzvORJi8BQBaGfXLAOQnuCGpJHkDYb1Cq6iOg+
+	 T3PQexjgwUpInDi5T9ctjYm4ofcncMfrvzf8898fSyzRqJ3RFJU2XIplpFrd6vzJYAmeS
+	 ivEFWM5lfzW5hz7bD0/CPyJ3RLsA+ptvefbhEKgp0F4PXMOX/tp9J/b0Dijw1pRRIrl4n
+	 iO8s995IUtf2gQOEI2lX/6qS4Gw+LVJEZGAE8dKH9zNU4+k2Ge1du/INwXZCeCsdeQJhG
+	 LqNLuWi2to0gfGcb4ZiuyD2m2rirqTJkTW1gieaJ1WRmj2u6EXcl8F0CPO8mXEmc+Cg==
+ARC-Message-Signature: i=2; d=osuosl.org; s=arc; a=rsa-sha256;
+	c=relaxed/relaxed; t=1790333803;
+	h=X-Comment:DKIM-Signature:X-Original-To:Delivered-To:Received:
+	 Received:X-Virus-Scanned:X-Spam-Flag:X-Spam-Score:X-Spam-Level:
+	 X-Spam-Status:Received:ARC-Filter:X-Comment:Received:Received:
+	 Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+	 Date:From:X-Virus-Scanned:X-Virus-Status:X-BeenThere:
+	 X-Mailman-Version:Precedence:List-Id:List-Unsubscribe:List-Archive:
+	 List-Post:List-Help:List-Subscribe:Errors-To;
+	bh=BuRTZJztRy9ytq8YLlqsg+OycTI3yfzo/MZ+CiTLk84=;
+	b=Sw5+dipmzfoiIqzDDId1y0+zNnkUO2rIV31FIMvp2yj2nLgIsDIC7GXEytcDPUp6Nuqa
+	 6+xAXwERboBLnd4OVu0k9h5JOj+YEKKCeZ5Gb07WK8beP2Ril4xDfv/Qb+dLhGcB5mUA1
+	 l/0IEaSIVNKPZtOr+DxYdNJoHVEZ6QYtvUQSyGBejd6gulNv4IOSOWYLOT4qpv2bHX1+Q
+	 au/F15b1ShjXKS45Z0Ae88xmEd3aYhHMfNVz6ClBQY9prZJk5AAFnz+j10HfXlJ8vRLLd
+	 MZyLV6jxfk0hY1KG8s+dAmThzEwXP0VU3l52pojvwa7BBHATCPQpvY08592sjgDtl+g==
+ARC-Authentication-Results: i=2; smtp3.osuosl.org;
+ arc=fail smtp.remote-ip=140.211.166.142
+X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142;
+ helo=lists1.osuosl.org;
+ envelope-from=u-boot-bounces@lists.u-boot-project.org; receiver=<UNKNOWN>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=lists.u-boot-project.org; s=default; t=1790333803;
+	bh=BuRTZJztRy9ytq8YLlqsg+OycTI3yfzo/MZ+CiTLk84=;
+	h=In-Reply-To:References:Subject:To:Cc:Date:From:List-Id:
+	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
+	 From;
+	b=T/1+Bf7hlEnnXOZBdya7Btxqr9TZaO4C18/jCoNXaCs1C6MGMGAUw1I9v44f2ctHG
+	 RpXZui+URc7gyyNRYTdVPXNh7fvn7TT5YNj/FhqJjFdYEX8PQoQxiHvufhrqHJLwal
+	 DQ08jlFISwWWD+Sm/0zGQ3jGDZRbxbuNStGFdJKqUj16TLt/QbGaeZ6DTUCVB/7Xzz
+	 mCulsfi3T5jPQsICDYPnjL+MagFoDY8pgkLBYJ/e9J7rNZYjlMG9Cmy6IR9ZAAkZTv
+	 Yd8q3Er9Ru8d0vwVSMC/myKfdXdj3+LnaNekGKSATOB8MliGaddaMDSFsJL1dyKHoe
+	 YU8UQ3vC4551A==
+Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142])
+	by smtp3.osuosl.org (Postfix) with ESMTP id 929A960D7B;
+	Fri, 25 Sep 2026 10:56:43 +0000 (UTC)
+X-Original-To: u-boot@lists.u-boot-project.org
+Delivered-To: u-boot@lists.u-boot-project.org
+Received: from smtp1.osuosl.org (smtp1.osuosl.org [IPv6:2605:bc80:3010::138])
+ by lists1.osuosl.org (Postfix) with ESMTP id 8EA99334
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:42 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by smtp1.osuosl.org (Postfix) with ESMTP id 8038581293
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:42 +0000 (UTC)
+X-Virus-Scanned: amavis at osuosl.org
+Received: from smtp1.osuosl.org ([127.0.0.1])
+ by localhost (smtp1.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id N3DmfggVshz1 for <u-boot@lists.u-boot-project.org>;
+ Fri, 25 Sep 2026 10:56:42 +0000 (UTC)
+ARC-Filter: OpenARC Filter v1.3.0 smtp1.osuosl.org C46E481285
+Authentication-Results: smtp1.osuosl.org; arc=none
+ smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+ARC-Seal: i=1; d=osuosl.org; s=arc; a=rsa-sha256; cv=none; t=1790333802;
+ b=oOTq1Kr+S2WuuMT9KtHVyQAA3XwnUYKL5fGj8QFoevqr8shcV9l/o4WeOz0ZHRTeGxlH
+ M/CPSD7B+GllUUReC6U03xynsfU58/GXDBvURNmY5brSXRz+y3WUtgemGcHvrHiZC8t13
+ IETN/FnVqAsChYJnRMRgSIMlSCpt5kRFjzaaxBODwnsLpAyvBg6hPaObtwZOrpbeXww3/
+ M59RvJwoI4iyCapMJuYZmgM3iPEjqFsisTL8LDkbPBt5komsXVC8JMxTCG4G8iki9IE2H
+ TK6nBjARbxqwighS7p+xIKsgBaCzhW6zAwuL2lIMp5yuHvCddhwi3Qpz0PNm9Y8cUZw==
+ARC-Message-Signature: i=1; d=osuosl.org; s=arc; a=rsa-sha256;
+ c=relaxed/relaxed; t=1790333802;
+ h=X-Comment:Received:X-Spam-Checker-Version:X-Spam-Level:X-Spam-Status:
+ Received:Received:In-Reply-To:References:Subject:To:Cc:Message-Id:
+ Date:From:X-Virus-Scanned:X-Virus-Status;
+ bh=BuRTZJztRy9ytq8YLlqsg+OycTI3yfzo/MZ+CiTLk84=;
+ b=hdFxG3TcOr/df4rK4QsO9njwiQCLsBRI5MOdpW8oy2QWzc5EOkx4F3S0w7Pp6hXZTmlJ
+ mwDbw+dUob96E/4dyQJYffHuNev0GRMr3GEeRThwSD7lHkEWr82FlWRBr7DIpjwpzSouJ
+ hmdWWzzVmks2N04tY0tudYbv1i9Q6VpLt4p1JKFVhthXI1vjGYn8Ojv6fRhVlDAnCgEXz
+ j9BajbmMXV23qr8KPsNz0bCZNuQVJr+YCD3D0Y8voAkF+2z021eqURgEUVZFvnc5mFVXj
+ 98sA6v3w3kAXmptjEWkdn9CzjwEhyzKRcHYzjVTO2QUcjxxlUlIkAlClbrPvrbwrAZg==
+ARC-Authentication-Results: i=1; smtp1.osuosl.org;
+ dmarc=fail header.from=lst.de;
+ spf=fail smtp.mailfrom=lst.de;
+ arc=none smtp.remote-ip="2a01:238:438b:c500:173d:9f52:ddab:ee01"
+X-Comment: SPF check N/A for local connections -
+ client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=duwe@lst.de; receiver=<UNKNOWN>
+Authentication-Results: smtp1.osuosl.org;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp1.osuosl.org; spf=fail smtp.mailfrom=lst.de
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+ by smtp1.osuosl.org (Postfix) with ESMTPS id C46E481285
+ for <u-boot@lists.u-boot-project.org>; Fri, 25 Sep 2026 10:56:39 +0000 (UTC)
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id AEE2C847E3; Fri, 25 Sep 2026 12:56:37 +0200 (CEST)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id EF4DA80117
+ for <u-boot@lists.denx.de>; Fri, 25 Sep 2026 12:56:35 +0200 (CEST)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 90F6C68D05; Fri, 25 Sep 2026 12:56:33 +0200 (CEST)
+In-Reply-To: <20260925105432.0F27E68C4E@verein.lst.de>
+References: <20260925105432.0F27E68C4E@verein.lst.de>
+Subject: [PATCH 8/8] configs: enable DWC3 on RPi5
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Neil_Armstrong_=3Cneil=2Earmstrong=40linaro=2Eorg=3E=2C?=
+	=?unknown-8bit?q?_Simon_Glass_=3Csjg=40chromium=2Eorg=3E=2C_Tom_Rini_=3Ctri?=
+	=?unknown-8bit?q?ni=40konsulko=2Ecom=3E=2C_Lukasz_Majewski_=3Clukma=40denx?=
+	=?unknown-8bit?q?=2Ede=3E=2C_Mattijs_Korpershoek_=3Cmkorpershoek=40kernel?=
+	=?unknown-8bit?q?=2Eorg=3E=2C_Marek_Vasut_=3Cmarek=2Evasut+renesas=40mailbo?=
+	=?unknown-8bit?q?x=2Eorg=3E=2C_Heiko_Schocher_=3Chs=40nabladev=2Ecom=3E=2C_?=
+	=?unknown-8bit?q?=22Lucien=2EJheng=22_=3Clucienzx159=40gmail=2Ecom=3E=2C_Ma?=
+	=?unknown-8bit?q?rtin_Schwan_=3Cm=2Eschwan=40phytec=2Ede=3E=2C_Rasmus_Ville?=
+	=?unknown-8bit?q?moes_=3Cravi=40prevas=2Edk=3E=2C_=22Filip_Kokosi=C5=84ski?=
+	=?unknown-8bit?q?=22_=3Cfilip=2Ekokosinski=40gmail=2Ecom=3E=2C_Anders_Roxel?=
+	=?unknown-8bit?q?l_=3Canders=2Eroxell=40linaro=2Eorg=3E=2C_Michal_Simek_=3C?=
+	=?unknown-8bit?q?michal=2Esimek=40amd=2Ecom=3E=2C_Peter_Korsgaard_=3Cpeter?=
+	=?unknown-8bit?q?=40korsgaard=2Ecom=3E=2C_Quentin_Schulz_=3Cquentin=2Eschul?=
+	=?unknown-8bit?q?z=40cherry=2Ede=3E=2C_Michael_Trimarchi_=3Cmichael=40amaru?=
+	=?unknown-8bit?q?lasolutions=2Ecom=3E=2C_=22Markus_Schneider-Pargmann_=28TI?=
+	=?unknown-8bit?q?=2Ecom=29=22_=3Cmsp=40baylibre=2Ecom=3E=2C_Dan_Carpenter_?=
+	=?unknown-8bit?q?=3Cdan=2Ecarpenter=40linaro=2Eorg=3E=2C_Tanmay_Kathpalia_?=
+	=?unknown-8bit?q?=3Ctanmay=2Ekathpalia=40altera=2Ecom=3E=2C_Peng_Fan_=3Cpen?=
+	=?unknown-8bit?q?g=2Efan=40nxp=2Ecom=3E=2C_Yegor_Yefremov_=3Cyegorslists=40?=
+	=?unknown-8bit?q?googlemail=2Ecom=3E=2C_Volodymyr_Babchuk_=3Cvolodymyr=5Fba?=
+	=?unknown-8bit?q?bchuk=40epam=2Ecom=3E=2C_Oleksii_Moisieiev_=3COleksii=5FMo?=
+	=?unknown-8bit?q?isieiev=40epam=2Ecom=3E=2C_u-boot=40lists=2Edenx=2Ede?=
+Message-Id: <20260925105633.90F6C68D05@verein.lst.de>
+Date: Fri, 25 Sep 2026 12:56:33 +0200 (CEST)
+From: duwe@lst.de (Torsten Duwe)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-BeenThere: u-boot@lists.u-boot-project.org
+X-Mailman-Version: 2.1.30
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.u-boot-project.org>
+List-Unsubscribe: <https://lists.u-boot-project.org/mailman/options/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=unsubscribe>
+List-Archive: <http://lists.u-boot-project.org/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.u-boot-project.org>
+List-Help: <mailto:u-boot-request@lists.u-boot-project.org?subject=help>
+List-Subscribe: <https://lists.u-boot-project.org/mailman/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.u-boot-project.org?subject=subscribe>
+Errors-To: u-boot-bounces@lists.u-boot-project.org
+
+From: Torsten Duwe <duwe@suse.de>
+
+The RP1 chip contains 2 DWC3 blocks. Now that we can access the RP1,
+enable the drivers. No further patches or glue code required.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+Reviewed-by: Simon Glass <sjg@chromium.org>
+Tested-by: Simon Glass <sjg@chromium.org>  # rpi5
+---
+ configs/rpi_arm64_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index 67b5311d4a6..7067020fc77 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -62,8 +62,10 @@ CONFIG_SYSINFO=y
+ CONFIG_SYSINFO_SMBIOS=y
+ CONFIG_USB=y
+ CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
+ CONFIG_USB_XHCI_PCI=y
+ CONFIG_USB_DWC2=y
++CONFIG_USB_DWC3=y
+ CONFIG_USB_KEYBOARD=y
+ CONFIG_USB_HOST_ETHER=y
+ CONFIG_USB_ETHER_LAN78XX=y
