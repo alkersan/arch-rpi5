@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = uboot-rpi5
+
+[Action]
+Description = Copy Raspberry 5 U-Boot to /boot
+When = PostTransaction
+Exec = /bin/sh -c 'cp /usr/lib/u-boot/u-boot-rpi5.bin /boot/'

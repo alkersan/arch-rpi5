@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eu
+
+[[ "${1:-}" == "/boot/kernel_2712.img" ]] || exit 0
+
+source /usr/lib/initcpio/functions
+decompress_cat "$1" | gzip -n > /tmp/kernel_2712.img
+chmod 0644 /tmp/kernel_2712.img
+mv -f /tmp/kernel_2712.img /boot/kernel_2712.img

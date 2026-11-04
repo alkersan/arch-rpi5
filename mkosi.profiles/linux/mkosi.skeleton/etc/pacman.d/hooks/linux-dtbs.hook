@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux-dtbs
+
+[Action]
+Description = Copy Raspberry Pi 5 DTB to /boot
+When = PostTransaction
+Exec = /bin/sh -c 'f=$(pacman -Qql linux-dtbs | grep "/dtb/broadcom/bcm2712-rpi-5-b\.dtb$") && [ -n "$f" ] && cp "$f" /boot/'

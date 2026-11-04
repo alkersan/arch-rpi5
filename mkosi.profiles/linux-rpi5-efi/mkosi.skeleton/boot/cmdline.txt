@@ -1,0 +1,1 @@
+console=ttyAMA10,115200 rootwait rw audit=0

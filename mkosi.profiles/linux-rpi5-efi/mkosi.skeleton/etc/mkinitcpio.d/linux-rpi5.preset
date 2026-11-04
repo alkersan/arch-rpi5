@@ -1,4 +1,4 @@
-ALL_kver="$(pacman -Qql linux-rpi5 | grep '/vmlinuz$')"
 PRESETS=('default')
+ALL_kver="$(pacman -Qql linux-rpi5 | grep '/vmlinuz$')"
 default_uki="/boot/EFI/BOOT/BOOTAA64.EFI"
 default_options="--no-cmdline"
