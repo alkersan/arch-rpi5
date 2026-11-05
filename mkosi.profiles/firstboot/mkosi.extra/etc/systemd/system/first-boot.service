@@ -1,0 +1,15 @@
+[Unit]
+Description=Execute first-boot script
+ConditionFirstBoot=yes
+ConditionPathIsRegular=/boot/first-boot
+RequiresMountsFor=/boot
+Wants=first-boot-complete.target
+Before=first-boot-complete.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /boot/first-boot
+ExecStopPost=/usr/bin/rm -f /boot/first-boot
+
+[Install]
+WantedBy=multi-user.target

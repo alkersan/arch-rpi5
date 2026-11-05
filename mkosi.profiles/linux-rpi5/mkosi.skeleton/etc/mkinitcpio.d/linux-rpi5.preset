@@ -1,3 +1,0 @@
-PRESETS=('default')
-ALL_kver="/boot/kernel_2712.img"
-default_image='/boot/initramfs_2712'

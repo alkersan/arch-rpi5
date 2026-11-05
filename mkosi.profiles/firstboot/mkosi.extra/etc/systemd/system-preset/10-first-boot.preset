@@ -1,2 +1,1 @@
 enable first-boot.service
-enable sshd.service
