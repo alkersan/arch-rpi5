@@ -37,15 +37,9 @@ install -m 0600 -o "$USER" -g "$USER" /dev/stdin "/home/$USER/.ssh/authorized_ke
 ssh-ed25519 AAAA...
 EOF
 
-# Allow passwordless run0
-install -m 0644 /dev/stdin /etc/polkit-1/rules.d/49-run0-user.rules <<EOF
-polkit.addRule(function(action, subject) {
-    if (subject.user === "$USER" &&
-        (action.id === "org.freedesktop.systemd1.manage-units" ||
-         action.id === "io.systemd.PTYBroker.acquire-pty-with-shell")) {
-        return polkit.Result.YES;
-    }
-});
+# Allow passwordless sudo
+install -m 0644 /dev/stdin /etc/sudoers.d/wheel <<EOF
+%wheel ALL=(ALL) NOPASSWD: ALL
 EOF
 ```
 
