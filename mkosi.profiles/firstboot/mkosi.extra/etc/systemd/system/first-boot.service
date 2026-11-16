@@ -1,7 +1,7 @@
 [Unit]
 Description=Execute first-boot script
 ConditionFirstBoot=yes
-ConditionPathIsRegular=/boot/first-boot
+ConditionPathExists=/boot/first-boot
 RequiresMountsFor=/boot
 Wants=first-boot-complete.target
 Before=first-boot-complete.target
