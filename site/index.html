@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arch Linux for Raspberry Pi 5</title>
+    <style>
+        body {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            font-family: Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+            background: #fff;
+            overflow-wrap: break-word;
+        }
+
+        h1, h2 {
+            color: #222;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 1.8em;
+        }
+
+        h2 {
+            margin-top: 1.8em;
+            font-size: 1.3em;
+        }
+
+        a {
+            color: #2458a6;
+        }
+
+        a:hover {
+            text-decoration-thickness: 2px;
+        }
+
+        a:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 3px;
+        }
+
+        code {
+            font-size: 0.95em;
+        }
+
+        pre {
+            padding: 12px;
+            overflow-x: auto;
+            background: #f4f4f4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #ddd;
+                background: #1d1f20;
+            }
+
+            h1, h2 {
+                color: #eee;
+            }
+
+            a {
+                color: #9ac5ff;
+            }
+
+            pre {
+                background: #292c2e;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Arch Linux for Raspberry Pi 5</h1>
+    <p>Pre-built disk images from the <a href="https://ports.archlinux.page/aarch64/">Arch Linux AArch64 Port</a>.</p>
+</header>
+<main>
+    <h2>Downloads</h2>
+    <ul>
+        <!-- DOWNLOADS -->
+    </ul>
+
+    <h2>About</h2>
+    <p>
+        Unofficial Raspberry Pi 5 images with a basic headless system, made from <code>drzee.net (ARMv8.2+)</code> repo.
+        See sources on <a href="https://github.com/alkersan/arch-rpi5">GitHub</a>.
+    </p>
+    <ul>
+        <li>only <code>base</code> packages with few extras, no desktop environment</li>
+        <li>no default user and password</li>
+        <li>Ethernet configured for DHCP network</li>
+        <li>root filesystem expands to the entire disk on first boot</li>
+        <li>used mkosi profiles: <code>linux-rpi5, firstboot, growfs, ssh</code></li>
+    </ul>
+
+    <h2>Writing an image</h2>
+    <p>Download image and checksum file. Check the download before writing:</p>
+    <pre><code>sha256sum --check *.SHA256SUMS</code></pre>
+    <p>Extract the <code>.img.xz</code> image and write to an SD card, USB or NVME drive with a disk image writer.</p>
+
+    <h2>First boot</h2>
+    <p>
+        Before boot, put a file named <code>first-boot</code> into the boot partition.
+        Use this bash script to create user accounts, SSH keys, etc.
+        See the <a href="https://github.com/alkersan/arch-rpi5#build">setup example</a> in the README.
+    </p>
+</main>
+</body>
+</html>
